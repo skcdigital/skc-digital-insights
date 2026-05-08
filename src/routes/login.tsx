@@ -160,6 +160,25 @@ function LoginPage() {
           {mode === "signin" ? "Need an account? Create one" : "Already have an account? Sign in"}
         </button>
 
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={async () => {
+              if (!email) { setError("Enter your email first, then click Forgot password."); return; }
+              setLoading(true); setError(null);
+              const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/login`,
+              });
+              setLoading(false);
+              if (error) setError(error.message);
+              else setInfo(`Password reset link sent to ${email} — check your inbox.`);
+            }}
+            className="mt-2 w-full text-center text-xs text-muted-foreground hover:text-primary"
+          >
+            Forgot password?
+          </button>
+        )}
+
         <p className="mt-6 text-center text-xs text-muted-foreground">
           <Link to="/" className="hover:text-primary">← Back to website</Link>
         </p>
