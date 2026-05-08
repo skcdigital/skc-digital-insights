@@ -48,6 +48,32 @@ export const Route = createFileRoute("/portfolio")({
   component: PortfolioPage,
 });
 
+function ResultsStrip() {
+  const stats = [
+    { before: "12", after: "31", unit: "enquiries/week", label: "Hair salon after one-page site" },
+    { before: "???", after: "Clear", unit: "monthly P&L", label: "Spaza owner after books cleanup" },
+    { before: "3 days", after: "48 hrs", unit: "per project", label: "Average delivery time" },
+    { before: "R0", after: "R250", unit: "starting price", label: "For most once-off tasks" },
+  ];
+  return (
+    <div className="border-b border-border bg-surface/40">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-border px-4 sm:grid-cols-4 sm:px-6 lg:px-8">
+        {stats.map((s) => (
+          <div key={s.label} className="flex flex-col items-center px-4 py-6 text-center">
+            <div className="flex items-baseline gap-2 font-mono text-xs text-muted-foreground">
+              <span className="line-through opacity-60">{s.before}</span>
+              <span className="text-primary">→</span>
+              <span className="text-base font-bold text-foreground">{s.after}</span>
+            </div>
+            <span className="mt-0.5 font-mono text-xs text-primary">{s.unit}</span>
+            <span className="mt-1 text-[11px] text-muted-foreground">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PortfolioPage() {
   return (
     <>
@@ -60,6 +86,8 @@ function PortfolioPage() {
         }
         description="Every sample below was built using the exact same tools and process we use for every client. No mockups — what you see is what you get."
       />
+
+      <ResultsStrip />
 
       <section className="mx-auto max-w-7xl space-y-12 px-4 pb-16 sm:px-6 lg:px-8">
         <CashFlowSample />

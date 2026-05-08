@@ -96,10 +96,10 @@ function Hero() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/contact"
+              to="/free-audit"
               className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Book a Free Audit
+              Get a Free Audit
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
@@ -354,10 +354,10 @@ function CtaBand() {
             <MessageCircle className="h-4 w-4" /> WhatsApp Now
           </a>
           <Link
-            to="/contact"
+            to="/free-audit"
             className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-5 py-3 text-sm font-semibold text-foreground hover:bg-surface"
           >
-            <Zap className="h-4 w-4 text-primary" /> Contact Form
+            <Zap className="h-4 w-4 text-primary" /> Free Audit Form
           </Link>
         </div>
       </div>

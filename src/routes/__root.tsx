@@ -33,11 +33,23 @@ function NotFoundComponent() {
   );
 }
 
+const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        {GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}');`,
+              }}
+            />
+          </>
+        )}
       </head>
       <body>
         {children}
