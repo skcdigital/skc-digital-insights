@@ -1,9 +1,23 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only),
-//     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
-//     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig();
+export default defineConfig(async ({ command }) => {
+  const { tanstackStart } = await import("@tanstack/react-start/plugin/vite");
+
+  const plugins: Parameters<typeof defineConfig>[0] extends (...args: any[]) => any
+    ? never
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    : any[] = [
+    tailwindcss(),
+    tsconfigPaths({ projects: ["./tsconfig.json"] }),
+    tanstackStart(),
+  ];
+
+  if (command === "build") {
+    const { cloudflare } = await import("@cloudflare/vite-plugin");
+    plugins.unshift(cloudflare({ viteEnvironment: { name: "ssr" } }));
+  }
+
+  return { plugins };
+});

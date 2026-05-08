@@ -13,6 +13,7 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FreeAuditRouteImport } from './routes/free-audit'
 import { Route as DemosRouteImport } from './routes/demos'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -28,12 +29,19 @@ import { Route as LegalServiceAgreementRouteImport } from './routes/legal.servic
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
 import { Route as ApiQuoteRouteImport } from './routes/api/quote'
+import { Route as ApiBlogPdfRouteImport } from './routes/api/blog-pdf'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminInvoicesRouteImport } from './routes/admin.invoices'
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
+import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
+import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
+import { Route as AdminQuotesIdRouteImport } from './routes/admin.quotes.$id'
+import { Route as AdminLeadsIdRouteImport } from './routes/admin.leads.$id'
+import { Route as AdminInvoicesIdRouteImport } from './routes/admin.invoices.$id'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -53,6 +61,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeAuditRoute = FreeAuditRouteImport.update({
+  id: '/free-audit',
+  path: '/free-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemosRoute = DemosRouteImport.update({
@@ -130,9 +143,19 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const ApiSendDocRoute = ApiSendDocRouteImport.update({
+  id: '/api/send-doc',
+  path: '/api/send-doc',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiQuoteRoute = ApiQuoteRouteImport.update({
   id: '/api/quote',
   path: '/api/quote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBlogPdfRoute = ApiBlogPdfRouteImport.update({
+  id: '/api/blog-pdf',
+  path: '/api/blog-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminQuotesRoute = AdminQuotesRouteImport.update({
@@ -160,6 +183,31 @@ const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   path: '/api/auth/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminCheckRoleRoute = ApiAdminCheckRoleRouteImport.update({
+  id: '/api/admin/check-role',
+  path: '/api/admin/check-role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminBootstrapRoute = ApiAdminBootstrapRouteImport.update({
+  id: '/api/admin/bootstrap',
+  path: '/api/admin/bootstrap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuotesIdRoute = AdminQuotesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminQuotesRoute,
+} as any)
+const AdminLeadsIdRoute = AdminLeadsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminLeadsRoute,
+} as any)
+const AdminInvoicesIdRoute = AdminInvoicesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminInvoicesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -170,15 +218,18 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/demos': typeof DemosRoute
+  '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
-  '/admin/invoices': typeof AdminInvoicesRoute
-  '/admin/leads': typeof AdminLeadsRoute
-  '/admin/quotes': typeof AdminQuotesRoute
+  '/admin/invoices': typeof AdminInvoicesRouteWithChildren
+  '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
+  '/api/send-doc': typeof ApiSendDocRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -186,6 +237,11 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/invoices/$id': typeof AdminInvoicesIdRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
+  '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
 }
 export interface FileRoutesByTo {
@@ -195,15 +251,18 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/demos': typeof DemosRoute
+  '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
-  '/admin/invoices': typeof AdminInvoicesRoute
-  '/admin/leads': typeof AdminLeadsRoute
-  '/admin/quotes': typeof AdminQuotesRoute
+  '/admin/invoices': typeof AdminInvoicesRouteWithChildren
+  '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
+  '/api/send-doc': typeof ApiSendDocRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -211,6 +270,11 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/admin/invoices/$id': typeof AdminInvoicesIdRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
+  '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
 }
 export interface FileRoutesById {
@@ -223,15 +287,18 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
   '/demos': typeof DemosRoute
+  '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
-  '/admin/invoices': typeof AdminInvoicesRoute
-  '/admin/leads': typeof AdminLeadsRoute
-  '/admin/quotes': typeof AdminQuotesRoute
+  '/admin/invoices': typeof AdminInvoicesRouteWithChildren
+  '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
+  '/api/send-doc': typeof ApiSendDocRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -239,6 +306,11 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/invoices/$id': typeof AdminInvoicesIdRoute
+  '/admin/leads/$id': typeof AdminLeadsIdRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
+  '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
 }
 export interface FileRouteTypes {
@@ -252,6 +324,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/demos'
+    | '/free-audit'
     | '/login'
     | '/portfolio'
     | '/pricing'
@@ -260,7 +333,9 @@ export interface FileRouteTypes {
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/api/blog-pdf'
     | '/api/quote'
+    | '/api/send-doc'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -268,6 +343,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/'
     | '/blog/'
+    | '/admin/invoices/$id'
+    | '/admin/leads/$id'
+    | '/admin/quotes/$id'
+    | '/api/admin/bootstrap'
+    | '/api/admin/check-role'
     | '/api/auth/signup'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -277,6 +357,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/demos'
+    | '/free-audit'
     | '/login'
     | '/portfolio'
     | '/pricing'
@@ -285,7 +366,9 @@ export interface FileRouteTypes {
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/api/blog-pdf'
     | '/api/quote'
+    | '/api/send-doc'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -293,6 +376,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin'
     | '/blog'
+    | '/admin/invoices/$id'
+    | '/admin/leads/$id'
+    | '/admin/quotes/$id'
+    | '/api/admin/bootstrap'
+    | '/api/admin/check-role'
     | '/api/auth/signup'
   id:
     | '__root__'
@@ -304,6 +392,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/contact'
     | '/demos'
+    | '/free-audit'
     | '/login'
     | '/portfolio'
     | '/pricing'
@@ -312,7 +401,9 @@ export interface FileRouteTypes {
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/api/blog-pdf'
     | '/api/quote'
+    | '/api/send-doc'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -320,6 +411,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/'
     | '/blog/'
+    | '/admin/invoices/$id'
+    | '/admin/leads/$id'
+    | '/admin/quotes/$id'
+    | '/api/admin/bootstrap'
+    | '/api/admin/check-role'
     | '/api/auth/signup'
   fileRoutesById: FileRoutesById
 }
@@ -332,15 +428,20 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   ContactRoute: typeof ContactRoute
   DemosRoute: typeof DemosRoute
+  FreeAuditRoute: typeof FreeAuditRoute
   LoginRoute: typeof LoginRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   ServicesRoute: typeof ServicesRoute
+  ApiBlogPdfRoute: typeof ApiBlogPdfRoute
   ApiQuoteRoute: typeof ApiQuoteRoute
+  ApiSendDocRoute: typeof ApiSendDocRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
   LegalServiceAgreementRoute: typeof LegalServiceAgreementRoute
   LegalTermsRoute: typeof LegalTermsRoute
+  ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
+  ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
 }
 
@@ -372,6 +473,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-audit': {
+      id: '/free-audit'
+      path: '/free-audit'
+      fullPath: '/free-audit'
+      preLoaderRoute: typeof FreeAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demos': {
@@ -479,11 +587,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/api/send-doc': {
+      id: '/api/send-doc'
+      path: '/api/send-doc'
+      fullPath: '/api/send-doc'
+      preLoaderRoute: typeof ApiSendDocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/quote': {
       id: '/api/quote'
       path: '/api/quote'
       fullPath: '/api/quote'
       preLoaderRoute: typeof ApiQuoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/blog-pdf': {
+      id: '/api/blog-pdf'
+      path: '/api/blog-pdf'
+      fullPath: '/api/blog-pdf'
+      preLoaderRoute: typeof ApiBlogPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/quotes': {
@@ -521,22 +643,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/check-role': {
+      id: '/api/admin/check-role'
+      path: '/api/admin/check-role'
+      fullPath: '/api/admin/check-role'
+      preLoaderRoute: typeof ApiAdminCheckRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/bootstrap': {
+      id: '/api/admin/bootstrap'
+      path: '/api/admin/bootstrap'
+      fullPath: '/api/admin/bootstrap'
+      preLoaderRoute: typeof ApiAdminBootstrapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotes/$id': {
+      id: '/admin/quotes/$id'
+      path: '/$id'
+      fullPath: '/admin/quotes/$id'
+      preLoaderRoute: typeof AdminQuotesIdRouteImport
+      parentRoute: typeof AdminQuotesRoute
+    }
+    '/admin/leads/$id': {
+      id: '/admin/leads/$id'
+      path: '/$id'
+      fullPath: '/admin/leads/$id'
+      preLoaderRoute: typeof AdminLeadsIdRouteImport
+      parentRoute: typeof AdminLeadsRoute
+    }
+    '/admin/invoices/$id': {
+      id: '/admin/invoices/$id'
+      path: '/$id'
+      fullPath: '/admin/invoices/$id'
+      preLoaderRoute: typeof AdminInvoicesIdRouteImport
+      parentRoute: typeof AdminInvoicesRoute
+    }
   }
 }
 
+interface AdminInvoicesRouteChildren {
+  AdminInvoicesIdRoute: typeof AdminInvoicesIdRoute
+}
+
+const AdminInvoicesRouteChildren: AdminInvoicesRouteChildren = {
+  AdminInvoicesIdRoute: AdminInvoicesIdRoute,
+}
+
+const AdminInvoicesRouteWithChildren = AdminInvoicesRoute._addFileChildren(
+  AdminInvoicesRouteChildren,
+)
+
+interface AdminLeadsRouteChildren {
+  AdminLeadsIdRoute: typeof AdminLeadsIdRoute
+}
+
+const AdminLeadsRouteChildren: AdminLeadsRouteChildren = {
+  AdminLeadsIdRoute: AdminLeadsIdRoute,
+}
+
+const AdminLeadsRouteWithChildren = AdminLeadsRoute._addFileChildren(
+  AdminLeadsRouteChildren,
+)
+
+interface AdminQuotesRouteChildren {
+  AdminQuotesIdRoute: typeof AdminQuotesIdRoute
+}
+
+const AdminQuotesRouteChildren: AdminQuotesRouteChildren = {
+  AdminQuotesIdRoute: AdminQuotesIdRoute,
+}
+
+const AdminQuotesRouteWithChildren = AdminQuotesRoute._addFileChildren(
+  AdminQuotesRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminChatsRoute: typeof AdminChatsRoute
-  AdminInvoicesRoute: typeof AdminInvoicesRoute
-  AdminLeadsRoute: typeof AdminLeadsRoute
-  AdminQuotesRoute: typeof AdminQuotesRoute
+  AdminInvoicesRoute: typeof AdminInvoicesRouteWithChildren
+  AdminLeadsRoute: typeof AdminLeadsRouteWithChildren
+  AdminQuotesRoute: typeof AdminQuotesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminChatsRoute: AdminChatsRoute,
-  AdminInvoicesRoute: AdminInvoicesRoute,
-  AdminLeadsRoute: AdminLeadsRoute,
-  AdminQuotesRoute: AdminQuotesRoute,
+  AdminInvoicesRoute: AdminInvoicesRouteWithChildren,
+  AdminLeadsRoute: AdminLeadsRouteWithChildren,
+  AdminQuotesRoute: AdminQuotesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -563,15 +756,20 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   ContactRoute: ContactRoute,
   DemosRoute: DemosRoute,
+  FreeAuditRoute: FreeAuditRoute,
   LoginRoute: LoginRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   ServicesRoute: ServicesRoute,
+  ApiBlogPdfRoute: ApiBlogPdfRoute,
   ApiQuoteRoute: ApiQuoteRoute,
+  ApiSendDocRoute: ApiSendDocRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
   LegalServiceAgreementRoute: LegalServiceAgreementRoute,
   LegalTermsRoute: LegalTermsRoute,
+  ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
+  ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
 }
 export const routeTree = rootRouteImport
