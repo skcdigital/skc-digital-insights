@@ -1,8 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Calendar, Clock, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Calendar, Clock, Mail, MessageCircle } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { SITE, waLink } from "@/lib/site";
 import { getPost, POSTS, type BlogPost } from "@/lib/blog-posts";
+import { generateBlogPdf, blobToBase64 } from "@/lib/blog-pdf";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }) => {
@@ -44,6 +46,84 @@ export const Route = createFileRoute("/blog/$slug")({
   component: BlogPostPage,
 });
 
+function GuideEmailForm({ post }: { post: BlogPost }) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const blob = await generateBlogPdf(post);
+      const pdfBase64 = await blobToBase64(blob);
+
+      const res = await fetch("/api/blog-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, slug: post.slug, postTitle: post.title, pdfBase64 }),
+      });
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error((json as { error?: string }).error || "Failed to send.");
+      }
+
+      setStatus("done");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
+      setStatus("error");
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <div className="mt-10 rounded-2xl border border-border bg-surface/40 p-6 text-center">
+        <p className="font-semibold text-foreground">Guide sent!</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Check your inbox — the branded PDF is on its way.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-10 rounded-2xl border border-border bg-surface/40 p-6">
+      <p className="font-mono text-xs uppercase tracking-wider text-primary">Free PDF guide</p>
+      <p className="mt-2 text-sm font-semibold text-foreground">
+        Get this article as a branded PDF
+      </p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Enter your email and we&apos;ll send you the full guide to save and share.
+      </p>
+      <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <input
+          type="email"
+          required
+          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={status === "loading"}
+          className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60"
+        />
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-60"
+        >
+          <Mail className="h-4 w-4" />
+          {status === "loading" ? "Sending…" : "Send me the guide"}
+        </button>
+      </form>
+      {status === "error" && (
+        <p className="mt-2 text-sm text-destructive">{errorMsg}</p>
+      )}
+    </div>
+  );
+}
+
 function BlogPostPage() {
   const { post } = Route.useLoaderData() as { post: BlogPost };
   const others = POSTS.filter((p) => p.slug !== post.slug).slice(0, 2);
@@ -82,6 +162,8 @@ function BlogPostPage() {
             </div>
           ))}
         </div>
+
+        <GuideEmailForm post={post} />
 
         <div className="mt-10 rounded-2xl border border-border bg-surface/40 p-6 text-center">
           <p className="text-sm text-muted-foreground">Want help putting this into practice?</p>
