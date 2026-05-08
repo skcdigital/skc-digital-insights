@@ -22,8 +22,8 @@ function AdminLayout() {
   const [bootstrapping, setBootstrapping] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login" });
-  }, [loading, user, navigate]);
+    if (!loading && isAdmin !== null && !user) navigate({ to: "/login" });
+  }, [loading, user, isAdmin, navigate]);
 
   // Bootstrap: if there are zero admins yet, the first signed-in user becomes admin.
   // Uses a server-side API to bypass RLS (client cannot read user_roles without being admin).
