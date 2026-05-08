@@ -37,15 +37,14 @@ function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.error || "Sign-up failed.");
+        const { error: signUpError } = await supabase.auth.signUp({ email, password });
+        if (signUpError) throw signUpError;
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) throw signInError;
+        if (signInError) {
+          setInfo("Account created! Check your email to confirm, then sign in.");
+          setMode("signin");
+          return;
+        }
         navigate({ to: "/admin" });
         return;
       } else {
