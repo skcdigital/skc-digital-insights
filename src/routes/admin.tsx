@@ -26,22 +26,29 @@ function AdminLayout() {
   }, [loading, user, navigate]);
 
   // Bootstrap: if there are zero admins yet, the first signed-in user becomes admin.
+  // Uses a server-side API to bypass RLS (client cannot read user_roles without being admin).
   useEffect(() => {
     if (!user || isAdmin || isAdmin === null) return;
     let cancelled = false;
     (async () => {
       setBootstrapping(true);
-      const { count } = await supabase
-        .from("user_roles")
-        .select("id", { count: "exact", head: true })
-        .eq("role", "admin");
-      if (cancelled) return;
-      if ((count ?? 0) === 0) {
-        await supabase.from("user_roles").insert({ user_id: user.id, role: "admin" });
-        router.invalidate();
-        window.location.reload();
+      try {
+        const res = await fetch("/api/admin/bootstrap", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user.id }),
+        });
+        if (cancelled) return;
+        const data = await res.json();
+        if (data.promoted) {
+          router.invalidate();
+          window.location.reload();
+          return;
+        }
+      } catch {
+        // bootstrap failed — user will see "not authorised" screen
       }
-      setBootstrapping(false);
+      if (!cancelled) setBootstrapping(false);
     })();
     return () => { cancelled = true; };
   }, [user, isAdmin, router]);
