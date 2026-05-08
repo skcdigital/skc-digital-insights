@@ -26,11 +26,22 @@ export function useAuth() {
       setIsAdmin(false);
       return;
     }
+
+    // Build-time whitelist — always works regardless of DB/RLS state
+    const whitelist = (import.meta.env.VITE_ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((e: string) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (user.email && whitelist.includes(user.email.toLowerCase())) {
+      setIsAdmin(true);
+      return;
+    }
+
+    // DB check as secondary verification
     supabase
       .rpc("is_admin")
       .then(({ data, error }) => {
         if (error) {
-          // fallback: try direct table query
           return supabase
             .from("user_roles")
             .select("role")
