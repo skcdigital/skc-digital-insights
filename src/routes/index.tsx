@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Mail, MessageCircle, Phone, Sparkles, Zap, Clock, Award, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Mail, MessageCircle, Phone, Sparkles, Zap, Clock, Award, CheckCircle2, Star } from "lucide-react";
 import { Terminal } from "@/components/terminal";
 import { Marquee } from "@/components/marquee";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SITE, waLink } from "@/lib/site";
 import { SERVICES } from "@/lib/services-data";
+import { TESTIMONIALS } from "@/lib/testimonials";
+import { FAQS } from "@/lib/faqs";
 
 const TITLE = "SKC Digital — IT Solutions, Web Development & Automation | Pretoria";
 const DESC =
@@ -55,6 +58,8 @@ function Index() {
       <Marquee />
       <ServicesPreview />
       <ProcessSection />
+      <TestimonialsSection />
+      <FaqSection />
       <CtaBand />
     </>
   );
@@ -236,6 +241,88 @@ function ProcessSection() {
               <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  return (
+    <section className="relative border-t border-border py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          eyebrow="Client stories"
+          title={<>Real results from <span className="text-gradient">real businesses</span></>}
+          desc="South African business owners who got more time back, more customers, and less headache."
+        />
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {TESTIMONIALS.map((t) => (
+            <figure
+              key={t.name}
+              className="flex flex-col rounded-xl border border-border bg-surface/40 p-6"
+            >
+              <div className="flex gap-0.5 text-primary">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-3.5 w-3.5 fill-primary" />
+                ))}
+              </div>
+              <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-3 border-t border-border pt-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 font-mono text-xs font-bold text-primary">
+                  {t.initials}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {t.role} · {t.location}
+                  </p>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqSection() {
+  return (
+    <section className="relative border-t border-border bg-surface/30 py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-14 lg:grid-cols-[1fr_1.4fr] lg:items-start">
+          <div>
+            <SectionHeader
+              eyebrow="FAQ"
+              title={<>Common <span className="text-gradient">questions</span></>}
+              desc="Everything you want to know before getting in touch — answered plainly."
+            />
+            <a
+              href={waLink("Hi SKC Digital, I have a question")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              <MessageCircle className="h-4 w-4" /> Ask on WhatsApp
+            </a>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full">
+            {FAQS.map((faq, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                <AccordionTrigger className="text-left text-sm font-semibold text-foreground hover:no-underline hover:text-primary">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </section>
