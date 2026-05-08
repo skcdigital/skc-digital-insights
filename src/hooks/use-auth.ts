@@ -26,13 +26,21 @@ export function useAuth() {
       setIsAdmin(false);
       return;
     }
-    fetch("/api/admin/check-role", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: user.id }),
-    })
-      .then((r) => r.json())
-      .then((d) => setIsAdmin(d.isAdmin === true))
+    supabase
+      .rpc("is_admin")
+      .then(({ data, error }) => {
+        if (error) {
+          // fallback: try direct table query
+          return supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("role", "admin")
+            .maybeSingle()
+            .then(({ data: row }) => setIsAdmin(!!row));
+        }
+        setIsAdmin(data === true);
+      })
       .catch(() => setIsAdmin(false));
   }, [user]);
 
