@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+const RESEND_URL = "https://api.resend.com";
 
 function escapeHtml(s: string) {
   return s
@@ -16,9 +16,8 @@ export const Route = createFileRoute("/api/quote")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
         const RESEND_API_KEY = process.env.RESEND_API_KEY;
-        if (!LOVABLE_API_KEY || !RESEND_API_KEY) {
+        if (!RESEND_API_KEY) {
           return Response.json(
             { error: "Email service is not configured." },
             { status: 500 },
@@ -87,12 +86,11 @@ export const Route = createFileRoute("/api/quote")({
           : undefined;
 
         // 1. Send the lead notification to SKC Digital (with PDF copy)
-        const internalRes = await fetch(`${GATEWAY_URL}/emails`, {
+        const internalRes = await fetch(`${RESEND_URL}/emails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": RESEND_API_KEY,
+            Authorization: `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
             from: "SKC Digital <noreply@skcdigital.co.za>",
@@ -123,12 +121,11 @@ export const Route = createFileRoute("/api/quote")({
             <p style="margin-top:24px">Best regards,<br/>Suzan &mdash; SKC Digital<br/><a href="https://www.skcdigital.co.za">skcdigital.co.za</a></p>
           </div>
         `;
-        await fetch(`${GATEWAY_URL}/emails`, {
+        await fetch(`${RESEND_URL}/emails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": RESEND_API_KEY,
+            Authorization: `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
             from: "SKC Digital <noreply@skcdigital.co.za>",
