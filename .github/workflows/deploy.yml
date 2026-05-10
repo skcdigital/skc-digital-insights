@@ -20,8 +20,8 @@ jobs:
       - run: npm run build
 
       - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: "5284ea7e91939f82da831392b31b8fb3"
-          command: deploy --config dist/server/wrangler.json
+        run: npx wrangler deploy
+        working-directory: dist/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "5284ea7e91939f82da831392b31b8fb3"
