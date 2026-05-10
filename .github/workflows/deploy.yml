@@ -23,5 +23,5 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: "5284ea7e91939f82da831392b31b8fb3"
           command: pages deploy dist/client --project-name=skc-digital-insights --branch=main
