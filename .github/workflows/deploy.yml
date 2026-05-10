@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare
 
 on:
   push:
@@ -19,9 +19,9 @@ jobs:
 
       - run: npm run build
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: "5284ea7e91939f82da831392b31b8fb3"
-          command: pages deploy dist/client --project-name=skc-digital-insights --branch=main
+          command: deploy --config dist/server/wrangler.json
