@@ -19,6 +19,9 @@ jobs:
 
       - run: npm run build
 
+      - name: Remove generated Windows-path wrangler deploy config
+        run: rm -rf .wrangler
+
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
         working-directory: dist/server
