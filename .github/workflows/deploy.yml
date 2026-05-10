@@ -4,10 +4,6 @@ on:
   push:
     branches: [main]
 
-env:
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  CLOUDFLARE_ACCOUNT_ID: "5284ea7e91939f82da831392b31b8fb3"
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,6 +15,17 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Check Cloudflare token is set
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN secret is empty or not set in GitHub"
+            exit 1
+          else
+            echo "✅ CLOUDFLARE_API_TOKEN is set (length: ${#TOKEN})"
+          fi
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       - run: npm ci --no-fund
 
       - run: npm run build
@@ -28,3 +35,6 @@ jobs:
           rm -rf .wrangler
           cd dist/server
           npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "5284ea7e91939f82da831392b31b8fb3"
