@@ -9,26 +9,25 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // onAuthStateChange fires immediately with INITIAL_SESSION (reads in-memory or localStorage).
+    // This is the single reliable source of truth for the current session.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
-    });
-    // getSession reads from localStorage — resolves on next microtask, no network needed
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
       setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
+    if (loading) return; // wait until auth state is known
+
     if (!user) {
       setIsAdmin(false);
       return;
     }
 
-    // Build-time whitelist — always works regardless of DB/RLS state
+    // Build-time whitelist — instant, no network
     const whitelist = (import.meta.env.VITE_ADMIN_EMAILS ?? "")
       .split(",")
       .map((e: string) => e.trim().toLowerCase())
@@ -38,7 +37,7 @@ export function useAuth() {
       return;
     }
 
-    // DB check as secondary verification
+    // DB fallback
     supabase
       .rpc("is_admin")
       .then(({ data, error }) => {
@@ -54,7 +53,7 @@ export function useAuth() {
         setIsAdmin(data === true);
       })
       .catch(() => setIsAdmin(false));
-  }, [user]);
+  }, [user, loading]);
 
   async function signOut() {
     await supabase.auth.signOut();
