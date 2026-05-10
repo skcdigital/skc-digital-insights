@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, Outlet, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
 import { LayoutDashboard, Users, FileText, Receipt, MessageSquare, LogOut, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Logo } from "@/components/logo";
@@ -17,13 +17,8 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   const { user, isAdmin, loading, signOut } = useAuth();
-  const navigate = useNavigate();
   const router = useRouter();
   const [bootstrapping, setBootstrapping] = useState(false);
-
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login" });
-  }, [loading, user, navigate]);
 
   // Bootstrap: if there are zero admins yet, the first signed-in user becomes admin.
   // Uses a server-side API to bypass RLS (client cannot read user_roles without being admin).
@@ -60,22 +55,8 @@ function AdminLayout() {
       </div>
     );
   }
-  if (!user) return null;
-  if (isAdmin === false) {
-    return (
-      <CenterMessage>
-        <p className="font-display text-xl font-bold">Not authorised</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Your account ({user.email}) does not have admin access.
-        </p>
-        <button
-          onClick={async () => { await signOut(); navigate({ to: "/login" }); }}
-          className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-        >
-          Sign out
-        </button>
-      </CenterMessage>
-    );
+  if (!user || isAdmin === false) {
+    return <SignInGate />;
   }
 
   return (
@@ -92,7 +73,7 @@ function AdminLayout() {
             </Link>
             <span className="hidden text-xs text-muted-foreground md:inline">{user.email}</span>
             <button
-              onClick={async () => { await signOut(); navigate({ to: "/login" }); }}
+              onClick={async () => { await signOut(); window.location.href = "/login"; }}
               className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-3 py-1.5 text-xs hover:border-primary/40"
             >
               <LogOut className="h-3.5 w-3.5" /> Sign out
@@ -155,6 +136,51 @@ function MobileNav({ to, icon, children }: { to: string; icon: React.ReactNode; 
       {icon}
       {children}
     </Link>
+  );
+}
+
+function SignInGate() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (err) setError(err.message);
+    // on success onAuthStateChange fires and re-renders the admin layout automatically
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
+        <Logo />
+        <h1 className="mt-6 font-display text-xl font-bold">Admin sign in</h1>
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <input
+            type="email" required placeholder="Email" value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+          />
+          <input
+            type="password" required placeholder="Password" value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+          />
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <button
+            type="submit" disabled={busy}
+            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
+            {busy ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
 
