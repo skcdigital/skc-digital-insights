@@ -1,4 +1,4 @@
-Hi, I'm Suzan — I started SKC Digital because I saw too many small South African businesses paying for clunky software they didn't need, or doing everything by hand on paper.
+Hi, I'm Suzan Kwinika— I started SKC Digital because I saw too many small South African businesses paying for clunky software they didn't need, or doing everything by hand on paper.
 
 By day I work in IT. By night I study BCom Business Informatics at UNISA. That mix means I don't just build tools — I understand why a business needs them, what saves money, and what just looks fancy.
 
