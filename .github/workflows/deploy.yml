@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_ADMIN_EMAILS: ${{ secrets.VITE_ADMIN_EMAILS }}
+          VITE_ADMIN_EMAILS: "info@skcdigital.co.za,suzankwinika0@gmail.com"
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
