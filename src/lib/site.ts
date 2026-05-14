@@ -2,7 +2,7 @@ export const SITE = {
   name: "SKC Digital",
   shortName: "SKC.Digital",
   domain: "skcdigital.co.za",
-  url: "https://www.skcdigital.co.za",
+  url: "https://skcdigital.co.za",
   email: "info@skcdigital.co.za",
   phone: "+27 67 379 3503",
   phoneRaw: "27673793503",

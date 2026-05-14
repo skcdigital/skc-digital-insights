@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/logo";
@@ -15,19 +15,18 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Redirect if already signed in.
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin" });
+      if (data.session) window.location.href = "/admin";
     });
-  }, [navigate]);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,22 +34,11 @@ function LoginPage() {
     setInfo(null);
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error: signUpError } = await supabase.auth.signUp({ email, password });
-        if (signUpError) throw signUpError;
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) {
-          setInfo("Account created! Check your email to confirm, then sign in.");
-          setMode("signin");
-          return;
-        }
-        navigate({ to: "/admin" });
-        return;
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/admin" });
-      }
+      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      if (err) throw err;
+      // Use a hard redirect so the new page reads a fully-flushed localStorage
+      // session instead of racing with TanStack Start's SSR navigation.
+      window.location.href = "/admin";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");
     } finally {
@@ -64,14 +52,12 @@ function LoginPage() {
         <Logo />
       </div>
       <div className="mt-8 rounded-2xl border border-border bg-surface/40 p-6 sm:p-8">
-        <h1 className="font-display text-2xl font-bold">
-          {mode === "signin" ? "Admin sign in" : "Create admin account"}
-        </h1>
+        <h1 className="font-display text-2xl font-bold">Admin sign in</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Restricted area for SKC Digital staff.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
             <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Email</span>
             <div className="relative">
@@ -96,7 +82,7 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                autoComplete="current-password"
                 className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-3 text-sm focus:border-primary focus:outline-none"
               />
             </div>
@@ -119,36 +105,26 @@ function LoginPage() {
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
             <LogIn className="h-4 w-4" />
-            {loading ? "Working…" : mode === "signin" ? "Sign in" : "Create account"}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
         <button
           type="button"
-          onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
+          onClick={async () => {
+            if (!email) { setError("Enter your email first, then click Forgot password."); return; }
+            setLoading(true); setError(null);
+            const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+              redirectTo: `${window.location.origin}/login`,
+            });
+            setLoading(false);
+            if (err) setError(err.message);
+            else setInfo(`Password reset link sent to ${email} — check your inbox.`);
+          }}
           className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary"
         >
-          {mode === "signin" ? "Need an account? Create one" : "Already have an account? Sign in"}
+          Forgot password?
         </button>
-
-        {mode === "signin" && (
-          <button
-            type="button"
-            onClick={async () => {
-              if (!email) { setError("Enter your email first, then click Forgot password."); return; }
-              setLoading(true); setError(null);
-              const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/login`,
-              });
-              setLoading(false);
-              if (error) setError(error.message);
-              else setInfo(`Password reset link sent to ${email} — check your inbox.`);
-            }}
-            className="mt-2 w-full text-center text-xs text-muted-foreground hover:text-primary"
-          >
-            Forgot password?
-          </button>
-        )}
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           <Link to="/" className="hover:text-primary">← Back to website</Link>

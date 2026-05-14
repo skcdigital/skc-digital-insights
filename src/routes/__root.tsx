@@ -1,4 +1,4 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { WhatsAppFab } from "../components/whatsapp-fab";
@@ -60,6 +60,17 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdminRoute = pathname.startsWith("/admin");
+
+  if (isAdminRoute) {
+    return (
+      <div className="bg-background text-foreground">
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <SiteHeader />
@@ -83,6 +94,10 @@ export const Route = createRootRoute({
       { property: "og:site_name", content: "SKC Digital" },
       { property: "og:locale", content: "en_ZA" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://skcdigital.co.za/og-image.svg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://skcdigital.co.za/og-image.svg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

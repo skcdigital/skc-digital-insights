@@ -523,7 +523,7 @@ function BookingDashboardSample() {
         title="Owner dashboard — bookings, revenue & customers"
         blurb="Replace the WhatsApp scroll-back with a clean dashboard. See today's schedule, this month's revenue, top services and customer activity at a glance — secured with login."
       />
-      <SampleFrame title="🔒 app.glowstudio.co.za/dashboard">
+      <SampleFrame title="🔒 salon admin dashboard — private demo">
         <div className="overflow-hidden rounded-lg border border-border bg-zinc-950 text-zinc-100">
           {/* Top bar */}
           <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/80 px-4 py-2.5">
@@ -680,7 +680,7 @@ function MobileAppSample() {
         title="Restaurant ordering app — mobile-first UI"
         blurb="Customers browse the menu, order and pay without ever leaving WhatsApp. Below: the kasi-restaurant ordering flow we built for a Sunnyside kitchen — installable as a PWA, no app store fees."
       />
-      <SampleFrame title="🔒 order.uthandokitchen.co.za">
+      <SampleFrame title="🔒 restaurant order app — private demo">
         <div className="grid gap-5 rounded-lg bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-5 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           {/* Phone mockup */}
           <div className="mx-auto w-full max-w-[260px]">
