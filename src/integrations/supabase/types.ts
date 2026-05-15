@@ -14,6 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
+      credit_note_items: {
+        Row: {
+          id: string
+          credit_note_id: string
+          position: number
+          description: string
+          quantity: number
+          unit_price: number
+          line_total: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          credit_note_id: string
+          position?: number
+          description: string
+          quantity?: number
+          unit_price?: number
+          line_total?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          credit_note_id?: string
+          position?: number
+          description?: string
+          quantity?: number
+          unit_price?: number
+          line_total?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_note_items_credit_note_id_fkey"
+            columns: ["credit_note_id"]
+            isOneToOne: false
+            referencedRelation: "credit_notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_notes: {
+        Row: {
+          id: string
+          number: string
+          invoice_id: string | null
+          lead_id: string | null
+          client_name: string
+          client_email: string | null
+          client_phone: string | null
+          client_address: string | null
+          issue_date: string
+          status: string
+          subtotal: number
+          total: number
+          reason: string | null
+          notes: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          number: string
+          invoice_id?: string | null
+          lead_id?: string | null
+          client_name: string
+          client_email?: string | null
+          client_phone?: string | null
+          client_address?: string | null
+          issue_date?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          reason?: string | null
+          notes?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          number?: string
+          invoice_id?: string | null
+          lead_id?: string | null
+          client_name?: string
+          client_email?: string | null
+          client_phone?: string | null
+          client_address?: string | null
+          issue_date?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          reason?: string | null
+          notes?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           created_at: string
@@ -428,6 +529,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ticket_replies: {
+        Row: {
+          id: string
+          ticket_id: string
+          user_id: string | null
+          content: string
+          is_internal: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ticket_id: string
+          user_id?: string | null
+          content: string
+          is_internal?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ticket_id?: string
+          user_id?: string | null
+          content?: string
+          is_internal?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_replies_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          id: string
+          number: string
+          lead_id: string | null
+          client_name: string
+          client_email: string | null
+          client_phone: string | null
+          subject: string
+          description: string | null
+          status: string
+          priority: string
+          category: string | null
+          assigned_to: string | null
+          resolved_at: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          number: string
+          lead_id?: string | null
+          client_name: string
+          client_email?: string | null
+          client_phone?: string | null
+          subject: string
+          description?: string | null
+          status?: string
+          priority?: string
+          category?: string | null
+          assigned_to?: string | null
+          resolved_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          number?: string
+          lead_id?: string | null
+          client_name?: string
+          client_email?: string | null
+          client_phone?: string | null
+          subject?: string
+          description?: string | null
+          status?: string
+          priority?: string
+          category?: string | null
+          assigned_to?: string | null
+          resolved_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

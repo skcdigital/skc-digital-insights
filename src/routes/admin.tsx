@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
-import { LayoutDashboard, Users, FileText, Receipt, MessageSquare, TicketIcon, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Receipt, MessageSquare, TicketIcon, RotateCcw, LogOut, ExternalLink } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Logo } from "@/components/logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,6 +89,7 @@ function AdminLayout() {
             <NavItem to="/admin/leads" icon={<Users className="h-4 w-4" />}>Leads</NavItem>
             <NavItem to="/admin/quotes" icon={<FileText className="h-4 w-4" />}>Quotes</NavItem>
             <NavItem to="/admin/invoices" icon={<Receipt className="h-4 w-4" />}>Invoices</NavItem>
+            <NavItem to="/admin/credit-notes" icon={<RotateCcw className="h-4 w-4" />}>Credit Notes</NavItem>
             <NavItem to="/admin/chats" icon={<MessageSquare className="h-4 w-4" />}>Chatbot</NavItem>
             <NavItem to="/admin/tickets" icon={<TicketIcon className="h-4 w-4" />}>Tickets</NavItem>
           </nav>

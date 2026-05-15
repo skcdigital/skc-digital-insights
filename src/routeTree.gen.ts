@@ -29,19 +29,24 @@ import { Route as LegalServiceAgreementRouteImport } from './routes/legal.servic
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
 import { Route as ApiQuoteRouteImport } from './routes/api/quote'
 import { Route as ApiBlogPdfRouteImport } from './routes/api/blog-pdf'
+import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminInvoicesRouteImport } from './routes/admin.invoices'
+import { Route as AdminCreditNotesRouteImport } from './routes/admin.credit-notes'
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
 import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
+import { Route as AdminTicketsIdRouteImport } from './routes/admin.tickets.$id'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin.quotes.$id'
 import { Route as AdminLeadsIdRouteImport } from './routes/admin.leads.$id'
 import { Route as AdminInvoicesIdRouteImport } from './routes/admin.invoices.$id'
+import { Route as AdminCreditNotesIdRouteImport } from './routes/admin.credit-notes.$id'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -143,6 +148,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const ApiTrackRoute = ApiTrackRouteImport.update({
+  id: '/api/track',
+  path: '/api/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSendDocRoute = ApiSendDocRouteImport.update({
   id: '/api/send-doc',
   path: '/api/send-doc',
@@ -158,6 +168,11 @@ const ApiBlogPdfRoute = ApiBlogPdfRouteImport.update({
   path: '/api/blog-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminQuotesRoute = AdminQuotesRouteImport.update({
   id: '/quotes',
   path: '/quotes',
@@ -171,6 +186,11 @@ const AdminLeadsRoute = AdminLeadsRouteImport.update({
 const AdminInvoicesRoute = AdminInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCreditNotesRoute = AdminCreditNotesRouteImport.update({
+  id: '/credit-notes',
+  path: '/credit-notes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChatsRoute = AdminChatsRouteImport.update({
@@ -193,6 +213,11 @@ const ApiAdminBootstrapRoute = ApiAdminBootstrapRouteImport.update({
   path: '/api/admin/bootstrap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTicketsIdRoute = AdminTicketsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminTicketsRoute,
+} as any)
 const AdminQuotesIdRoute = AdminQuotesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -207,6 +232,11 @@ const AdminInvoicesIdRoute = AdminInvoicesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => AdminInvoicesRoute,
+} as any)
+const AdminCreditNotesIdRoute = AdminCreditNotesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminCreditNotesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -224,12 +254,15 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
+  '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
+  '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -237,9 +270,11 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
   '/admin/invoices/$id': typeof AdminInvoicesIdRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/admin/tickets/$id': typeof AdminTicketsIdRoute
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -257,12 +292,15 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
+  '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
+  '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -270,9 +308,11 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
+  '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
   '/admin/invoices/$id': typeof AdminInvoicesIdRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/admin/tickets/$id': typeof AdminTicketsIdRoute
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -293,12 +333,15 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
+  '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
+  '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
+  '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -306,9 +349,11 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
+  '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
   '/admin/invoices/$id': typeof AdminInvoicesIdRoute
   '/admin/leads/$id': typeof AdminLeadsIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/admin/tickets/$id': typeof AdminTicketsIdRoute
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
@@ -330,12 +375,15 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/admin/chats'
+    | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/admin/tickets'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
+    | '/api/track'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -343,9 +391,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/'
     | '/blog/'
+    | '/admin/credit-notes/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
     | '/admin/quotes/$id'
+    | '/admin/tickets/$id'
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
@@ -363,12 +413,15 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/admin/chats'
+    | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/admin/tickets'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
+    | '/api/track'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -376,9 +429,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin'
     | '/blog'
+    | '/admin/credit-notes/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
     | '/admin/quotes/$id'
+    | '/admin/tickets/$id'
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
@@ -398,12 +453,15 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/admin/chats'
+    | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
     | '/admin/quotes'
+    | '/admin/tickets'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
+    | '/api/track'
     | '/blog/$slug'
     | '/legal/privacy'
     | '/legal/refund'
@@ -411,9 +469,11 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/'
     | '/blog/'
+    | '/admin/credit-notes/$id'
     | '/admin/invoices/$id'
     | '/admin/leads/$id'
     | '/admin/quotes/$id'
+    | '/admin/tickets/$id'
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
@@ -436,6 +496,7 @@ export interface RootRouteChildren {
   ApiBlogPdfRoute: typeof ApiBlogPdfRoute
   ApiQuoteRoute: typeof ApiQuoteRoute
   ApiSendDocRoute: typeof ApiSendDocRoute
+  ApiTrackRoute: typeof ApiTrackRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
   LegalServiceAgreementRoute: typeof LegalServiceAgreementRoute
@@ -587,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/api/track': {
+      id: '/api/track'
+      path: '/api/track'
+      fullPath: '/api/track'
+      preLoaderRoute: typeof ApiTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/send-doc': {
       id: '/api/send-doc'
       path: '/api/send-doc'
@@ -608,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBlogPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/tickets': {
+      id: '/admin/tickets'
+      path: '/tickets'
+      fullPath: '/admin/tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/quotes': {
       id: '/admin/quotes'
       path: '/quotes'
@@ -627,6 +702,13 @@ declare module '@tanstack/react-router' {
       path: '/invoices'
       fullPath: '/admin/invoices'
       preLoaderRoute: typeof AdminInvoicesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/credit-notes': {
+      id: '/admin/credit-notes'
+      path: '/credit-notes'
+      fullPath: '/admin/credit-notes'
+      preLoaderRoute: typeof AdminCreditNotesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/chats': {
@@ -657,6 +739,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminBootstrapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/tickets/$id': {
+      id: '/admin/tickets/$id'
+      path: '/$id'
+      fullPath: '/admin/tickets/$id'
+      preLoaderRoute: typeof AdminTicketsIdRouteImport
+      parentRoute: typeof AdminTicketsRoute
+    }
     '/admin/quotes/$id': {
       id: '/admin/quotes/$id'
       path: '/$id'
@@ -678,8 +767,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInvoicesIdRouteImport
       parentRoute: typeof AdminInvoicesRoute
     }
+    '/admin/credit-notes/$id': {
+      id: '/admin/credit-notes/$id'
+      path: '/$id'
+      fullPath: '/admin/credit-notes/$id'
+      preLoaderRoute: typeof AdminCreditNotesIdRouteImport
+      parentRoute: typeof AdminCreditNotesRoute
+    }
   }
 }
+
+interface AdminCreditNotesRouteChildren {
+  AdminCreditNotesIdRoute: typeof AdminCreditNotesIdRoute
+}
+
+const AdminCreditNotesRouteChildren: AdminCreditNotesRouteChildren = {
+  AdminCreditNotesIdRoute: AdminCreditNotesIdRoute,
+}
+
+const AdminCreditNotesRouteWithChildren =
+  AdminCreditNotesRoute._addFileChildren(AdminCreditNotesRouteChildren)
 
 interface AdminInvoicesRouteChildren {
   AdminInvoicesIdRoute: typeof AdminInvoicesIdRoute
@@ -717,19 +824,35 @@ const AdminQuotesRouteWithChildren = AdminQuotesRoute._addFileChildren(
   AdminQuotesRouteChildren,
 )
 
+interface AdminTicketsRouteChildren {
+  AdminTicketsIdRoute: typeof AdminTicketsIdRoute
+}
+
+const AdminTicketsRouteChildren: AdminTicketsRouteChildren = {
+  AdminTicketsIdRoute: AdminTicketsIdRoute,
+}
+
+const AdminTicketsRouteWithChildren = AdminTicketsRoute._addFileChildren(
+  AdminTicketsRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminChatsRoute: typeof AdminChatsRoute
+  AdminCreditNotesRoute: typeof AdminCreditNotesRouteWithChildren
   AdminInvoicesRoute: typeof AdminInvoicesRouteWithChildren
   AdminLeadsRoute: typeof AdminLeadsRouteWithChildren
   AdminQuotesRoute: typeof AdminQuotesRouteWithChildren
+  AdminTicketsRoute: typeof AdminTicketsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminChatsRoute: AdminChatsRoute,
+  AdminCreditNotesRoute: AdminCreditNotesRouteWithChildren,
   AdminInvoicesRoute: AdminInvoicesRouteWithChildren,
   AdminLeadsRoute: AdminLeadsRouteWithChildren,
   AdminQuotesRoute: AdminQuotesRouteWithChildren,
+  AdminTicketsRoute: AdminTicketsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -764,6 +887,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBlogPdfRoute: ApiBlogPdfRoute,
   ApiQuoteRoute: ApiQuoteRoute,
   ApiSendDocRoute: ApiSendDocRoute,
+  ApiTrackRoute: ApiTrackRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
   LegalServiceAgreementRoute: LegalServiceAgreementRoute,
