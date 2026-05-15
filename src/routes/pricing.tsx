@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, MessageCircle, Sparkles } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
-import { SITE, waLink } from "@/lib/site";
+import { SITE } from "@/lib/site";
+import { TrackedWALink } from "@/components/tracked-wa-link";
 
 const TITLE = "Pricing — Transparent Local Rates | SKC Digital";
 const DESC =
@@ -121,10 +122,10 @@ function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={waLink(p.msg)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <TrackedWALink
+                message={p.msg}
+                source={`pricing/${p.id}`}
+                service={p.badge}
                 className={`mt-8 inline-flex items-center justify-center gap-2 rounded-md px-4 py-3 text-sm font-semibold ${
                   p.highlight
                     ? "bg-primary text-primary-foreground hover:opacity-90"
@@ -132,7 +133,7 @@ function PricingPage() {
                 }`}
               >
                 <MessageCircle className="h-4 w-4" /> {p.cta}
-              </a>
+              </TrackedWALink>
             </article>
           ))}
         </div>

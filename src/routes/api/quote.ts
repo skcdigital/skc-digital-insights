@@ -53,13 +53,46 @@ export const Route = createFileRoute("/api/quote")({
           return Response.json({ error: "Invalid email address." }, { status: 400 });
         }
 
-        // Save lead to database (best-effort, don't block email if it fails)
+        // Save lead + ticket (best-effort, don't block email if it fails)
         try {
-          await supabaseAdmin.from("leads").insert({
-            name, email, service, budget, deadline, message, channel: "form", status: "new",
+          const { data: lead } = await supabaseAdmin
+            .from("leads")
+            .insert({ name, email, service, budget, deadline, message, channel: "form", status: "new" })
+            .select("id")
+            .single();
+
+          const priority =
+            deadline === "This week" ? "high" :
+            deadline === "Within 2 weeks" ? "medium" : "low";
+
+          const categoryMap: Record<string, string> = {
+            "Website": "website",
+            "Bookkeeping setup": "bookkeeping",
+            "Excel/automation": "technical",
+            "Business Process Automation": "technical",
+            "Google Business Profile": "general",
+            "Care plan": "billing",
+          };
+
+          const { data: counter } = await supabaseAdmin
+            .from("doc_counters").select("last_number").eq("kind", "ticket").single();
+          const next = (counter?.last_number ?? 0) + 1;
+          await supabaseAdmin.from("doc_counters").upsert({ kind: "ticket", last_number: next });
+          const ticketNumber = `SKC-TK-${new Date().getFullYear()}-${String(next).padStart(4, "0")}`;
+
+          await supabaseAdmin.from("tickets").insert({
+            number:       ticketNumber,
+            lead_id:      lead?.id ?? null,
+            client_name:  name,
+            client_email: email,
+            subject:      `Quote request — ${service}`,
+            description:  `Budget: ${budget}\nDeadline: ${deadline}\n\n${message}`,
+            status:       "open",
+            priority,
+            category:     categoryMap[service] ?? "general",
           });
         } catch (err) {
-          console.error("Lead save failed", err);
+          console.error("Lead/ticket save failed", err);
         }
 
         const internalSubject = `New quote request — ${name} (${service})`;

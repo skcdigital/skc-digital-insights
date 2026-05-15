@@ -3,7 +3,8 @@ import { ArrowRight, Mail, MessageCircle, Phone, Sparkles, Zap, Clock, Award, Ch
 import { Terminal } from "@/components/terminal";
 import { Marquee } from "@/components/marquee";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { SITE, waLink } from "@/lib/site";
+import { SITE } from "@/lib/site";
+import { TrackedWALink } from "@/components/tracked-wa-link";
 import { SERVICES } from "@/lib/services-data";
 import { TESTIMONIALS } from "@/lib/testimonials";
 import { FAQS } from "@/lib/faqs";
@@ -102,25 +103,23 @@ function Hero() {
               Get a Free Audit
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <a
-              href={waLink(`Hi ${SITE.name}, can you do a free audit of my business?`)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <TrackedWALink
+              message={`Hi ${SITE.name}, can you do a free audit of my business?`}
+              source="hero"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface"
             >
               <MessageCircle className="h-4 w-4 text-primary" /> WhatsApp Audit
-            </a>
+            </TrackedWALink>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-            <a
-              href={waLink("Hi Suzan")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <TrackedWALink
+              message="Hi Suzan"
+              source="hero-phone"
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary"
             >
               <Phone className="h-4 w-4" /> {SITE.phone}
-            </a>
+            </TrackedWALink>
             <a
               href={`mailto:${SITE.email}`}
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary"
@@ -200,14 +199,13 @@ function ServicesPreview() {
               Have a unique requirement? Describe your problem and we&apos;ll
               build a solution around it — no job too small or unusual.
             </p>
-            <a
-              href={waLink("Hi, I have a custom project")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <TrackedWALink
+              message="Hi, I have a custom project"
+              source="services-preview-custom"
               className="mt-6 inline-flex items-center gap-1.5 font-mono text-sm text-primary hover:underline"
             >
               Let&apos;s talk <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            </TrackedWALink>
           </article>
         </div>
       </div>
@@ -301,14 +299,13 @@ function FaqSection() {
               title={<>Common <span className="text-gradient">questions</span></>}
               desc="Everything you want to know before getting in touch — answered plainly."
             />
-            <a
-              href={waLink("Hi SKC Digital, I have a question")}
-              target="_blank"
-              rel="noopener noreferrer"
+            <TrackedWALink
+              message="Hi SKC Digital, I have a question"
+              source="faq"
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               <MessageCircle className="h-4 w-4" /> Ask on WhatsApp
-            </a>
+            </TrackedWALink>
           </div>
 
           <Accordion type="single" collapsible className="w-full">
@@ -345,14 +342,13 @@ function CtaBand() {
           <CheckCircle2 className="h-3.5 w-3.5" /> Free audit · typically responds within 4 hours
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <a
-            href={waLink(`Hi ${SITE.name}, can you do a free digital audit for my business?`)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <TrackedWALink
+            message={`Hi ${SITE.name}, can you do a free digital audit for my business?`}
+            source="cta-band"
             className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             <MessageCircle className="h-4 w-4" /> WhatsApp Now
-          </a>
+          </TrackedWALink>
           <Link
             to="/free-audit"
             className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-5 py-3 text-sm font-semibold text-foreground hover:bg-surface"

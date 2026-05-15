@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { SERVICES } from "@/lib/services-data";
-import { SITE, waLink } from "@/lib/site";
+import { SITE } from "@/lib/site";
+import { TrackedWALink } from "@/components/tracked-wa-link";
 
 const TITLE = "Services — Excel, Web, Bookkeeping & Automation | SKC Digital";
 const DESC =
@@ -68,14 +69,14 @@ function ServicesPage() {
                   ))}
                 </ul>
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <a
-                    href={waLink(`Hi ${SITE.name}, I'm interested in ${s.title}.`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <TrackedWALink
+                    message={`Hi ${SITE.name}, I'm interested in ${s.title}.`}
+                    source={`services/${s.id}`}
+                    service={s.title}
                     className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
                   >
                     <MessageCircle className="h-4 w-4" /> Get a quote
-                  </a>
+                  </TrackedWALink>
                   <Link
                     to="/pricing"
                     className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-4 py-2 text-sm font-semibold hover:bg-surface"

@@ -168,7 +168,20 @@ function AuditForm() {
 
   function handleWhatsApp(e: React.FormEvent) {
     e.preventDefault();
-    window.open(waLink(buildWaMessage()), "_blank", "noopener,noreferrer");
+    const msg = buildWaMessage();
+    // Track in background — don't block WhatsApp from opening
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source:  "audit",
+        service: challenge || bizType,
+        message: msg,
+        name,
+        phone,
+      }),
+    }).catch(() => {});
+    window.open(waLink(msg), "_blank", "noopener,noreferrer");
     setSent(true);
   }
 
