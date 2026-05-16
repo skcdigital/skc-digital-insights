@@ -205,16 +205,21 @@ function QuoteForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, pdfBase64 }),
       });
+      const resData = await res.json().catch(() => ({} as Record<string, unknown>));
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.error || "We couldn't send your request. Try WhatsApp or email instead.");
+        setError((resData as { error?: string }).error || "We couldn't send your request. Try WhatsApp or email instead.");
         setStatus("idle");
         return;
       }
+      // Lead saved but email not sent (Resend not configured) — open WhatsApp automatically
+      if ((resData as { emailSent?: boolean }).emailSent === false) {
+        window.open(waLink(buildWhatsAppMessage()), "_blank", "noopener,noreferrer");
+      }
       setStatus("sent");
     } catch {
-      setError("Network error. Try WhatsApp or email instead.");
-      setStatus("idle");
+      // Network completely down — fall back to WhatsApp
+      window.open(waLink(buildWhatsAppMessage()), "_blank", "noopener,noreferrer");
+      setStatus("sent");
     }
   }
 
@@ -343,18 +348,20 @@ function QuoteForm() {
         </button>
       </div>
 
-      {status === "sent" && pdfBlob && (
+      {status === "sent" && (
         <div className="mt-4 rounded-lg border border-primary/40 bg-primary/10 p-4 text-sm">
           <p className="font-semibold text-foreground">
-            ✅ Your quote request has been emailed to us — and a branded PDF copy has been sent to {email}.
+            ✅ Request received! We&apos;ll reply within 4 hours via WhatsApp or email.
           </p>
-          <button
-            type="button"
-            onClick={() => downloadBlob(pdfBlob, `SKC-Digital-Quote-${name.replace(/\s+/g, "-")}.pdf`)}
-            className="mt-3 inline-flex items-center gap-2 rounded-md border border-primary/60 bg-background px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10"
-          >
-            <FileDown className="h-3.5 w-3.5" /> Download your PDF
-          </button>
+          {pdfBlob && (
+            <button
+              type="button"
+              onClick={() => downloadBlob(pdfBlob, `SKC-Digital-Quote-${name.replace(/\s+/g, "-")}.pdf`)}
+              className="mt-3 inline-flex items-center gap-2 rounded-md border border-primary/60 bg-background px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10"
+            >
+              <FileDown className="h-3.5 w-3.5" /> Download PDF copy
+            </button>
+          )}
         </div>
       )}
 

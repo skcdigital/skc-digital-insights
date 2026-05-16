@@ -43,42 +43,48 @@ export const Route = createFileRoute("/api/track")({
           : `WhatsApp click — ${source || "website"}`;
 
         // Save lead
-        const { data: lead } = await supabaseAdmin
-          .from("leads")
-          .insert({
-            name,
-            email,
-            phone,
-            service: service || null,
-            message: message || null,
-            channel: "whatsapp",
-            status:  "new",
-          })
-          .select("id")
-          .single()
-          .catch(() => ({ data: null }));
+        let lead: { id: string } | null = null;
+        try {
+          const { data } = await supabaseAdmin
+            .from("leads")
+            .insert({
+              name,
+              email,
+              phone,
+              service: service || null,
+              message: message || null,
+              channel: "whatsapp",
+              status:  "new",
+            })
+            .select("id")
+            .single();
+          lead = data as { id: string } | null;
+        } catch { /* best-effort */ }
 
         // Save ticket
         const number = await nextTicketNumber();
-        const { data: ticket } = await supabaseAdmin
-          .from("tickets")
-          .insert({
-            number,
-            lead_id:      lead?.id ?? null,
-            client_name:  name,
-            client_email: email,
-            client_phone: phone,
-            subject,
-            description:  message || `WhatsApp click from ${source}`,
-            status:       "open",
-            priority,
-            category,
-          })
-          .select("id")
-          .single()
-          .catch(() => ({ data: null }));
+        let ticketId: string | undefined;
+        try {
+          const { data: ticket } = await supabaseAdmin
+            .from("tickets")
+            .insert({
+              number,
+              lead_id:      lead?.id ?? null,
+              client_name:  name,
+              client_email: email,
+              client_phone: phone,
+              subject,
+              description:  message || `WhatsApp click from ${source}`,
+              status:       "open",
+              priority,
+              category,
+            })
+            .select("id")
+            .single();
+          ticketId = (ticket as { id: string } | null)?.id;
+        } catch { /* best-effort */ }
 
-        return Response.json({ ok: true, ticketId: ticket?.id });
+        return Response.json({ ok: true, ticketId });
       },
     },
   },

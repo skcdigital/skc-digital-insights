@@ -17,12 +17,6 @@ export const Route = createFileRoute("/api/quote")({
     handlers: {
       POST: async ({ request }) => {
         const RESEND_API_KEY = process.env.RESEND_API_KEY;
-        if (!RESEND_API_KEY) {
-          return Response.json(
-            { error: "Email service is not configured." },
-            { status: 500 },
-          );
-        }
 
         let payload: Record<string, unknown>;
         try {
@@ -53,7 +47,7 @@ export const Route = createFileRoute("/api/quote")({
           return Response.json({ error: "Invalid email address." }, { status: 400 });
         }
 
-        // Save lead + ticket (best-effort, don't block email if it fails)
+        // Save lead + ticket first (always attempt, regardless of email config)
         try {
           const { data: lead } = await supabaseAdmin
             .from("leads")
@@ -93,6 +87,11 @@ export const Route = createFileRoute("/api/quote")({
           });
         } catch (err) {
           console.error("Lead/ticket save failed", err);
+        }
+
+        // If no Resend key, lead is still saved — return success without email
+        if (!RESEND_API_KEY) {
+          return Response.json({ ok: true, emailSent: false });
         }
 
         const internalSubject = `New quote request — ${name} (${service})`;
