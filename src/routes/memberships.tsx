@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Zap, TrendingUp, Rocket, ArrowRight, MessageCircle, HelpCircle } from "lucide-react";
+import { Check, Zap, TrendingUp, Rocket, ArrowRight, MessageCircle, HelpCircle, X, Loader2, CreditCard } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { SITE } from "@/lib/site";
 import { TrackedWALink } from "@/components/tracked-wa-link";
+import { supabase } from "@/integrations/supabase/client";
 
 const TITLE = "Membership Plans — SKC Digital";
 const DESC =
@@ -25,6 +26,13 @@ export const Route = createFileRoute("/memberships")({
 });
 
 type BillingInterval = "monthly" | "annual";
+
+type CheckoutPlan = {
+  slug: string;
+  name: string;
+  price: number;
+  billing: BillingInterval;
+} | null;
 
 const PLANS = [
   {
@@ -110,6 +118,7 @@ const FAQS = [
 
 function MembershipsPage() {
   const [billing, setBilling] = useState<BillingInterval>("monthly");
+  const [checkoutPlan, setCheckoutPlan] = useState<CheckoutPlan>(null);
 
   return (
     <div>
@@ -193,19 +202,30 @@ function MembershipsPage() {
                   ))}
                 </ul>
 
-                <TrackedWALink
-                  message={plan.cta_msg}
-                  source={`memberships/${plan.slug}`}
-                  service={plan.name}
-                  className={`mt-8 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-opacity ${
-                    plan.highlight
-                      ? "bg-primary text-primary-foreground hover:opacity-90"
-                      : "border border-border bg-background hover:border-primary/40"
-                  }`}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Get started — {plan.name}
-                </TrackedWALink>
+                <div className="mt-8 flex flex-col gap-2">
+                  <button
+                    onClick={() =>
+                      setCheckoutPlan({ slug: plan.slug, name: plan.name, price, billing })
+                    }
+                    className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-opacity ${
+                      plan.highlight
+                        ? "bg-primary text-primary-foreground hover:opacity-90"
+                        : "border border-border bg-background hover:border-primary/40"
+                    }`}
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    Pay &amp; activate — {plan.name}
+                  </button>
+                  <TrackedWALink
+                    message={plan.cta_msg}
+                    source={`memberships/${plan.slug}`}
+                    service={plan.name}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Or enquire via WhatsApp
+                  </TrackedWALink>
+                </div>
               </article>
             );
           })}
@@ -279,15 +299,147 @@ function MembershipsPage() {
             >
               Book a free consultation <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link
-              to="/products"
+            <a
+              href="/products"
               className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 font-semibold hover:border-primary/40"
             >
               Browse digital products
-            </Link>
+            </a>
           </div>
         </div>
       </section>
+
+      {checkoutPlan && (
+        <MembershipCheckoutModal
+          plan={checkoutPlan}
+          onClose={() => setCheckoutPlan(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function MembershipCheckoutModal({
+  plan,
+  onClose,
+}: {
+  plan: NonNullable<CheckoutPlan>;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Pre-fill email if user is signed in
+  useState(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user?.email) setEmail(data.session.user.email);
+    });
+  });
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      // Look up plan ID from Supabase
+      const { data: planRow } = await supabase
+        .from("membership_plans")
+        .select("id")
+        .eq("slug", plan.slug)
+        .maybeSingle();
+
+      if (!planRow) {
+        setError("Plan not found. Please refresh and try again.");
+        setLoading(false);
+        return;
+      }
+
+      const res = await fetch("/api/yoco/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "membership",
+          itemId: (planRow as { id: string }).id,
+          billing: plan.billing,
+          email,
+          idempotencyKey: `membership-${plan.slug}-${email}-${Date.now()}`,
+        }),
+      });
+
+      const data = await res.json() as { redirectUrl?: string; error?: string };
+
+      if (!res.ok || !data.redirectUrl) {
+        setError(data.error ?? "Payment failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = data.redirectUrl;
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+      setLoading(false);
+    }
+  }
+
+  const suffix = plan.billing === "annual" ? "annual plan" : "first month";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <div className="relative w-full max-w-sm rounded-2xl border border-border bg-surface p-8 shadow-xl">
+        <button onClick={onClose} className="absolute right-4 top-4 rounded-md p-1 hover:bg-border">
+          <X className="h-4 w-4" />
+        </button>
+
+        <p className="font-mono text-xs uppercase tracking-wider text-primary">
+          {plan.name} Membership
+        </p>
+        <p className="mt-1 text-2xl font-bold">R{plan.price.toLocaleString("en-ZA")}</p>
+        <p className="text-xs text-muted-foreground">{suffix} · ZAR · Yoco secure payment</p>
+
+        <p className="mt-3 text-sm text-muted-foreground">
+          After payment your membership activates immediately. Renewals are managed via EFT invoice each month.
+        </p>
+
+        <form onSubmit={handlePay} className="mt-5 space-y-4">
+          <label className="block">
+            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              Your email
+            </span>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            />
+          </label>
+
+          {error && (
+            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
+            {loading ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting to payment…</>
+            ) : (
+              <><CreditCard className="h-4 w-4" /> Pay R{plan.price.toLocaleString("en-ZA")}</>
+            )}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-[11px] text-muted-foreground">
+          Powered by <span className="font-semibold">Yoco</span> · South African payment gateway
+        </p>
+      </div>
     </div>
   );
 }

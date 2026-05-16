@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   FileText, BookOpen, Wrench, Package, Mail, Sparkles,
-  ShoppingCart, Download, ArrowRight, Star,
+  ShoppingCart, Download, ArrowRight, Star, X, Loader2,
 } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { SITE } from "@/lib/site";
@@ -57,10 +57,13 @@ const FILTER_TABS = [
   { key: "newsletter",    label: "Newsletter" },
 ];
 
+type CheckoutTarget = { id: string; title: string; price_zar: number } | null;
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [checkoutTarget, setCheckoutTarget] = useState<CheckoutTarget>(null);
 
   useEffect(() => {
     supabase
@@ -130,7 +133,7 @@ export default function ProductsPage() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} onBuy={() => setCheckoutTarget(product)} />
           ))}
         </div>
 
@@ -152,6 +155,14 @@ export default function ProductsPage() {
           </div>
         )}
       </section>
+
+      {/* Yoco checkout modal */}
+      {checkoutTarget && (
+        <CheckoutModal
+          product={checkoutTarget}
+          onClose={() => setCheckoutTarget(null)}
+        />
+      )}
 
       {/* Membership upsell banner */}
       <section className="border-t border-border bg-surface/40">
@@ -178,7 +189,7 @@ export default function ProductsPage() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }) {
   const typeInfo = TYPE_LABELS[product.type] ?? TYPE_LABELS.other;
 
   return (
@@ -197,7 +208,6 @@ function ProductCard({ product }: { product: Product }) {
             <span className="font-mono text-[10px] uppercase tracking-wider">{typeInfo.label}</span>
           </div>
         )}
-        {/* Type badge */}
         <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground backdrop-blur">
           {typeInfo.icon}
           {typeInfo.label}
@@ -218,17 +228,126 @@ function ProductCard({ product }: { product: Product }) {
           <span className="text-xl font-bold">
             {product.is_free ? "Free" : `R${product.price_zar.toLocaleString("en-ZA")}`}
           </span>
-          <a
-            href={`/contact?product=${encodeURIComponent(product.slug)}`}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            {product.is_free ? (
-              <><Download className="h-3.5 w-3.5" /> Download</>
-            ) : (
-              <><ShoppingCart className="h-3.5 w-3.5" /> Buy now</>
-            )}
-          </a>
+          {product.is_free ? (
+            <a
+              href={`/contact?product=${encodeURIComponent(product.slug)}`}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              <Download className="h-3.5 w-3.5" /> Get it free
+            </a>
+          ) : (
+            <button
+              onClick={onBuy}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" /> Buy now
+            </button>
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CheckoutModal({
+  product,
+  onClose,
+}: {
+  product: CheckoutTarget & object;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/yoco/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "product",
+          itemId: product!.id,
+          email,
+          idempotencyKey: `${product!.id}-${email}-${Date.now()}`,
+        }),
+      });
+
+      const data = await res.json() as { redirectUrl?: string; error?: string };
+
+      if (!res.ok || !data.redirectUrl) {
+        setError(data.error ?? "Payment failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Redirect to Yoco hosted payment page
+      window.location.href = data.redirectUrl;
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <div className="relative w-full max-w-sm rounded-2xl border border-border bg-surface p-8 shadow-xl">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-md p-1 hover:bg-border"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <h2 className="font-bold text-lg leading-snug">{product!.title}</h2>
+        <p className="mt-1 text-2xl font-bold text-primary">
+          R{product!.price_zar.toLocaleString("en-ZA")}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Secure payment via Yoco · ZAR · Once-off
+        </p>
+
+        <form onSubmit={handlePay} className="mt-6 space-y-4">
+          <label className="block">
+            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              Your email (for download link)
+            </span>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+            />
+          </label>
+
+          {error && (
+            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          >
+            {loading ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting to payment…</>
+            ) : (
+              <><ShoppingCart className="h-4 w-4" /> Pay R{product!.price_zar.toLocaleString("en-ZA")}</>
+            )}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-[11px] text-muted-foreground">
+          Powered by <span className="font-semibold">Yoco</span> · South African payment gateway
+        </p>
       </div>
     </div>
   );

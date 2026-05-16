@@ -31,6 +31,7 @@ import { Route as LegalServiceAgreementRouteImport } from './routes/legal.servic
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as CheckoutFailedRouteImport } from './routes/checkout.failed'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
@@ -44,8 +45,8 @@ import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminInvoicesRouteImport } from './routes/admin.invoices'
 import { Route as AdminCreditNotesRouteImport } from './routes/admin.credit-notes'
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
-import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
-import { Route as ApiStripeCheckoutRouteImport } from './routes/api/stripe/checkout'
+import { Route as ApiYocoWebhookRouteImport } from './routes/api/yoco/webhook'
+import { Route as ApiYocoCheckoutRouteImport } from './routes/api/yoco/checkout'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
 import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
@@ -165,6 +166,11 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutFailedRoute = CheckoutFailedRouteImport.update({
+  id: '/checkout/failed',
+  path: '/checkout/failed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -230,14 +236,14 @@ const AdminChatsRoute = AdminChatsRouteImport.update({
   path: '/chats',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
-  id: '/api/stripe/webhook',
-  path: '/api/stripe/webhook',
+const ApiYocoWebhookRoute = ApiYocoWebhookRouteImport.update({
+  id: '/api/yoco/webhook',
+  path: '/api/yoco/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiStripeCheckoutRoute = ApiStripeCheckoutRouteImport.update({
-  id: '/api/stripe/checkout',
-  path: '/api/stripe/checkout',
+const ApiYocoCheckoutRoute = ApiYocoCheckoutRouteImport.update({
+  id: '/api/yoco/checkout',
+  path: '/api/yoco/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
@@ -310,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -325,8 +332,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
+  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -370,8 +378,8 @@ export interface FileRoutesByTo {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
+  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -403,6 +411,7 @@ export interface FileRoutesById {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/failed': typeof CheckoutFailedRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
@@ -418,8 +427,8 @@ export interface FileRoutesById {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
+  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -452,6 +461,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/failed'
     | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
@@ -467,8 +477,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/stripe/checkout'
-    | '/api/stripe/webhook'
+    | '/api/yoco/checkout'
+    | '/api/yoco/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -497,6 +507,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/failed'
     | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
@@ -512,8 +523,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/stripe/checkout'
-    | '/api/stripe/webhook'
+    | '/api/yoco/checkout'
+    | '/api/yoco/webhook'
   id:
     | '__root__'
     | '/'
@@ -544,6 +555,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/failed'
     | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
@@ -559,8 +571,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/stripe/checkout'
-    | '/api/stripe/webhook'
+    | '/api/yoco/checkout'
+    | '/api/yoco/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -583,6 +595,7 @@ export interface RootRouteChildren {
   ApiQuoteRoute: typeof ApiQuoteRoute
   ApiSendDocRoute: typeof ApiSendDocRoute
   ApiTrackRoute: typeof ApiTrackRoute
+  CheckoutFailedRoute: typeof CheckoutFailedRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
@@ -591,8 +604,8 @@ export interface RootRouteChildren {
   ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
-  ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
-  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  ApiYocoCheckoutRoute: typeof ApiYocoCheckoutRoute
+  ApiYocoWebhookRoute: typeof ApiYocoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -751,6 +764,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/failed': {
+      id: '/checkout/failed'
+      path: '/checkout/failed'
+      fullPath: '/checkout/failed'
+      preLoaderRoute: typeof CheckoutFailedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/$slug': {
       id: '/blog/$slug'
       path: '/$slug'
@@ -842,18 +862,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChatsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/stripe/webhook': {
-      id: '/api/stripe/webhook'
-      path: '/api/stripe/webhook'
-      fullPath: '/api/stripe/webhook'
-      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+    '/api/yoco/webhook': {
+      id: '/api/yoco/webhook'
+      path: '/api/yoco/webhook'
+      fullPath: '/api/yoco/webhook'
+      preLoaderRoute: typeof ApiYocoWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/stripe/checkout': {
-      id: '/api/stripe/checkout'
-      path: '/api/stripe/checkout'
-      fullPath: '/api/stripe/checkout'
-      preLoaderRoute: typeof ApiStripeCheckoutRouteImport
+    '/api/yoco/checkout': {
+      id: '/api/yoco/checkout'
+      path: '/api/yoco/checkout'
+      fullPath: '/api/yoco/checkout'
+      preLoaderRoute: typeof ApiYocoCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/signup': {
@@ -1032,6 +1052,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiQuoteRoute: ApiQuoteRoute,
   ApiSendDocRoute: ApiSendDocRoute,
   ApiTrackRoute: ApiTrackRoute,
+  CheckoutFailedRoute: CheckoutFailedRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
@@ -1040,8 +1061,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
-  ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
-  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  ApiYocoCheckoutRoute: ApiYocoCheckoutRoute,
+  ApiYocoWebhookRoute: ApiYocoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

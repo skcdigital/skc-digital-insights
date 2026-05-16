@@ -4,4 +4,13 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Runtime secrets — set via: npx wrangler secret put YOCO_SECRET_KEY
+  // Or add in Cloudflare dashboard → Workers & Pages → skc-digital-insights → Settings → Variables
+  // Required secrets:
+  //   SUPABASE_URL            — Supabase project URL
+  //   SUPABASE_SERVICE_ROLE_KEY — Supabase service role key
+  //   RESEND_API_KEY          — Email sending (Resend.com)
+  //   YOCO_SECRET_KEY         — Yoco secret key (from Yoco developer portal → API Keys)
+  //   YOCO_WEBHOOK_SECRET     — Yoco webhook secret (from Yoco developer portal → Webhooks)
+  //   SITE_URL                — https://www.skcdigital.co.za
 }
