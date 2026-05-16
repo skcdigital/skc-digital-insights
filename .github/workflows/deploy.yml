@@ -24,20 +24,15 @@ jobs:
         env:
           VITE_ADMIN_EMAILS: "info@skcdigital.co.za,suzankwinika0@gmail.com"
 
+      - name: Inject runtime env vars into wrangler config
+        run: node scripts/patch-wrangler.js
+        env:
+          RESEND_API_KEY: "re_G2fzGzrg_KHvWGqWFhAtmRKWawhujrdh6"
+          SUPABASE_URL: "https://abucbojsosfxdaufdapw.supabase.co"
+          SUPABASE_SERVICE_ROLE_KEY: "sb_secret_urfmnu1WLcDFIszum0z1ag_itAwuxM_"
+
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy --config dist/server/wrangler.json
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: "5284ea7e91939f82da831392b31b8fb3"
-
-      - name: Push secrets to Cloudflare Worker
-        run: |
-          echo "$RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config dist/server/wrangler.json
-          echo "$SUPABASE_SERVICE_ROLE_KEY" | npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --config dist/server/wrangler.json
-          echo "$SUPABASE_URL" | npx wrangler secret put SUPABASE_URL --config dist/server/wrangler.json
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: "5284ea7e91939f82da831392b31b8fb3"
-          RESEND_API_KEY: "re_G2fzGzrg_KHvWGqWFhAtmRKWawhujrdh6"
-          SUPABASE_SERVICE_ROLE_KEY: "sb_secret_urfmnu1WLcDFIszum0z1ag_itAwuxM_"
-          SUPABASE_URL: "https://abucbojsosfxdaufdapw.supabase.co"

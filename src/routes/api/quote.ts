@@ -117,9 +117,7 @@ export const Route = createFileRoute("/api/quote")({
             ]
           : undefined;
 
-        // Use onboarding@resend.dev — works without domain verification.
-        // reply_to ensures replies land in the right inbox.
-        const FROM = "SKC Digital <onboarding@resend.dev>";
+        const FROM = "SKC Digital <noreply@skcdigital.co.za>";
 
         async function sendEmail(payload: Record<string, unknown>) {
           const r = await fetch(`${RESEND_URL}/emails`, {
