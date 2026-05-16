@@ -88,32 +88,50 @@ export default function ShopPage() {
   const [checkoutPlan, setCheckoutPlan]       = useState<CheckoutPlan>(null);
 
   useEffect(() => {
-    Promise.all([
-      supabase
-        .from("products")
-        .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
-        .eq("is_published", true)
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("membership_plans")
-        .select("id, slug, name, tagline, price_monthly, price_annual, features, is_popular")
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true }),
-    ]).then(([{ data: prods }, { data: pls }]) => {
-      setProducts((prods as Product[]) ?? []);
-      const raw = (pls ?? []) as Array<Omit<Plan, "features"> & { features: unknown }>;
-      setPlans(
-        raw.map((p) => ({
-          ...p,
-          features: Array.isArray(p.features)
-            ? (p.features as string[])
-            : typeof p.features === "string"
-            ? (JSON.parse(p.features) as string[])
-            : [],
-        }))
-      );
-      setLoading(false);
-    });
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const [{ data: prods, error: prodErr }, { data: pls, error: planErr }] =
+          await Promise.all([
+            supabase
+              .from("products")
+              .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
+              .eq("is_published", true)
+              .order("sort_order", { ascending: true }),
+            supabase
+              .from("membership_plans")
+              .select("id, slug, name, tagline, price_monthly, price_annual, features, is_popular")
+              .eq("is_active", true)
+              .order("sort_order", { ascending: true }),
+          ]);
+
+        if (cancelled) return;
+
+        if (prodErr) console.error("products:", prodErr.message);
+        if (planErr) console.error("plans:", planErr.message);
+
+        setProducts((prods as Product[]) ?? []);
+        const raw = (pls ?? []) as Array<Omit<Plan, "features"> & { features: unknown }>;
+        setPlans(
+          raw.map((p) => ({
+            ...p,
+            features: Array.isArray(p.features)
+              ? (p.features as string[])
+              : typeof p.features === "string"
+              ? (JSON.parse(p.features) as string[])
+              : [],
+          }))
+        );
+      } catch (err) {
+        if (!cancelled) console.error("shop load failed:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void load();
+    return () => { cancelled = true; };
   }, []);
 
   const showPlans    = filter === "all" || filter === "plans";
@@ -210,10 +228,14 @@ export default function ShopPage() {
               </>
             )}
 
-            {showProducts && visibleProducts.length === 0 && filter !== "all" && (
+            {showProducts && visibleProducts.length === 0 && (
               <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
                 <Sparkles className="h-8 w-8 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">No products in this category yet — check back soon.</p>
+                <p className="text-sm text-muted-foreground">
+                  {filter === "all"
+                    ? "Products are on their way — check back shortly."
+                    : "No products in this category yet — check back soon."}
+                </p>
               </div>
             )}
 

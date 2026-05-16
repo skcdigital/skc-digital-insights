@@ -109,26 +109,28 @@ function LoginPage() {
           </button>
         </form>
 
-        <button
-          type="button"
-          onClick={async () => {
-            if (!email) { setError("Enter your email first, then click Forgot password."); return; }
-            setLoading(true); setError(null);
-            const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: `${window.location.origin}/login`,
-            });
-            setLoading(false);
-            if (err) setError(err.message);
-            else setInfo(`Password reset link sent to ${email} — check your inbox.`);
-          }}
-          className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary"
-        >
-          Forgot password?
-        </button>
-
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          <Link to="/" className="hover:text-primary">← Back to website</Link>
-        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={async () => {
+              if (!email) { setError("Enter your email above first, then click Reset password."); return; }
+              setLoading(true); setError(null); setInfo(null);
+              const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/login`,
+              });
+              setLoading(false);
+              if (err) setError(err.message);
+              else setInfo(`Reset link sent to ${email} — check your inbox (and spam folder).`);
+            }}
+            className="text-xs text-primary underline-offset-2 hover:underline disabled:opacity-50"
+          >
+            Reset password
+          </button>
+          <Link to="/" className="text-xs text-muted-foreground hover:text-primary">
+            ← Back to site
+          </Link>
+        </div>
       </div>
     </div>
   );
