@@ -97,19 +97,18 @@ function Hero() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/free-audit"
+              to="/products"
               className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Get a Free Audit
+              Browse the Shop
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <TrackedWALink
-              message={`Hi ${SITE.name}, can you do a free audit of my business?`}
-              source="hero"
+            <Link
+              to="/free-audit"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-surface/60 px-5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface"
             >
-              <MessageCircle className="h-4 w-4 text-primary" /> WhatsApp Audit
-            </TrackedWALink>
+              Get a Free Audit
+            </Link>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">

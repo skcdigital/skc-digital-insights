@@ -9,8 +9,16 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // onAuthStateChange fires immediately with INITIAL_SESSION (reads in-memory or localStorage).
-    // This is the single reliable source of truth for the current session.
+    // Read the current session from storage immediately (instant for fresh tokens, avoids
+    // waiting on the INITIAL_SESSION event which can lag in supabase-js v2 when a refresh
+    // is needed and the Supabase backend is cold-starting).
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Subscribe for sign-in / sign-out / token-refresh events going forward.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
@@ -37,22 +45,20 @@ export function useAuth() {
       return;
     }
 
-    // DB fallback
-    supabase
-      .rpc("is_admin")
-      .then(({ data, error }) => {
-        if (error) {
-          return supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .eq("role", "admin")
-            .maybeSingle()
-            .then(({ data: row }) => setIsAdmin(!!row));
-        }
-        setIsAdmin(data === true);
-      })
-      .catch(() => setIsAdmin(false));
+    // DB fallback — check user_roles table directly
+    void (async () => {
+      try {
+        const { data: row } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        setIsAdmin(!!row);
+      } catch {
+        setIsAdmin(false);
+      }
+    })();
   }, [user, loading]);
 
   async function signOut() {

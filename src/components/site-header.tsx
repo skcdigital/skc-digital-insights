@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { NAV, SITE, waLink } from "@/lib/site";
+import { NAV } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 
@@ -53,14 +53,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href={waLink(`Hi ${SITE.name}, I'd like a free audit.`)}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/products"
             className="hidden rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
           >
-            Free Audit
-          </a>
+            Shop Now
+          </Link>
           <button
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -89,14 +87,13 @@ export function SiteHeader() {
                   {item.label}
                 </Link>
               ))}
-              <a
-                href={waLink(`Hi ${SITE.name}, I'd like a free audit.`)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/products"
                 className="mt-2 rounded-md bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground"
+                onClick={() => setOpen(false)}
               >
-                Free Audit
-              </a>
+                Shop Now
+              </Link>
             </div>
           </nav>
         </div>

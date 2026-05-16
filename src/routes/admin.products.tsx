@@ -16,7 +16,6 @@ type Product = {
   is_published: boolean;
   is_free: boolean;
   sort_order: number;
-  stripe_price_id: string | null;
   created_at: string;
 };
 
@@ -27,16 +26,16 @@ type ProductForm = {
   type: string;
   price_zar: string;
   cover_url: string;
+  preview_url: string;
   is_published: boolean;
   is_free: boolean;
   sort_order: string;
-  stripe_price_id: string;
 };
 
 const EMPTY_FORM: ProductForm = {
   slug: "", title: "", description: "", type: "pdf_guide",
-  price_zar: "0", cover_url: "", is_published: false, is_free: false,
-  sort_order: "0", stripe_price_id: "",
+  price_zar: "0", cover_url: "", preview_url: "", is_published: false, is_free: false,
+  sort_order: "0",
 };
 
 const TYPE_OPTIONS = [
@@ -89,10 +88,10 @@ function ProductsAdminPage() {
       type: p.type,
       price_zar: String(p.price_zar),
       cover_url: p.cover_url ?? "",
+      preview_url: "",
       is_published: p.is_published,
       is_free: p.is_free,
       sort_order: String(p.sort_order),
-      stripe_price_id: p.stripe_price_id ?? "",
     });
     setError("");
     setShowForm(true);
@@ -113,10 +112,10 @@ function ProductsAdminPage() {
       type: form.type,
       price_zar: parseFloat(form.price_zar) || 0,
       cover_url: form.cover_url.trim() || null,
+      preview_url: form.preview_url.trim() || null,
       is_published: form.is_published,
       is_free: form.is_free,
       sort_order: parseInt(form.sort_order) || 0,
-      stripe_price_id: form.stripe_price_id.trim() || null,
     };
     const { error: err } = editing
       ? await supabase.from("products").update(payload).eq("id", editing.id)
@@ -200,8 +199,8 @@ function ProductsAdminPage() {
                 <input value={form.cover_url} onChange={(e) => f("cover_url", e.target.value)} placeholder="https://..." className={INPUT} />
               </Field>
 
-              <Field label="Stripe Price ID (optional — wire up before going live)">
-                <input value={form.stripe_price_id} onChange={(e) => f("stripe_price_id", e.target.value)} placeholder="price_..." className={INPUT} />
+              <Field label="Preview / sample URL (optional — shown before purchase)">
+                <input value={form.preview_url} onChange={(e) => f("preview_url", e.target.value)} placeholder="https://..." className={INPUT} />
               </Field>
 
               <div className="flex flex-wrap gap-6">

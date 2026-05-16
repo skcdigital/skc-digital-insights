@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   FileText, BookOpen, Wrench, Package, Mail, Sparkles,
-  ShoppingCart, Download, ArrowRight, Star, X, Loader2,
+  ShoppingCart, Download, ArrowRight, X, Loader2,
+  Check, Zap, TrendingUp, Rocket, CreditCard, ShieldCheck, Clock, Repeat,
 } from "lucide-react";
 import { submitPayFastForm } from "@/lib/payfast";
-import { PageHero } from "@/components/page-hero";
 import { SITE } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 
-const TITLE = "Digital Products — SKC Digital";
+const TITLE = "Shop — SKC Digital";
 const DESC =
-  "Ready-to-use PDF guides, business templates, online tools, and done-for-you packs. Download instantly and level up your business today.";
+  "PDF guides, Excel tools, courses, done-for-you packs and membership plans built for South African businesses. Pay once, download instantly.";
 
 export const Route = createFileRoute("/products")({
   head: () => ({
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/products")({
       { name: "twitter:description", content: DESC },
     ],
   }),
-  component: ProductsPage,
+  component: ShopPage,
 });
 
 type Product = {
@@ -40,68 +40,130 @@ type Product = {
   sort_order: number;
 };
 
-const TYPE_LABELS: Record<string, { label: string; icon: React.ReactNode }> = {
-  pdf_guide:     { label: "PDF Guide",        icon: <FileText className="h-4 w-4" /> },
-  course:        { label: "Course",           icon: <BookOpen className="h-4 w-4" /> },
-  software_tool: { label: "Tool / Script",    icon: <Wrench className="h-4 w-4" /> },
-  done_for_you:  { label: "Done-For-You",     icon: <Package className="h-4 w-4" /> },
-  newsletter:    { label: "Newsletter",       icon: <Mail className="h-4 w-4" /> },
-  other:         { label: "Other",            icon: <Sparkles className="h-4 w-4" /> },
+type Plan = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  price_monthly: number;
+  price_annual: number | null;
+  features: string[];
+  is_popular: boolean;
+};
+
+type CheckoutProduct = { id: string; title: string; price_zar: number } | null;
+type CheckoutPlan = { id: string; slug: string; name: string; price: number; billing: "monthly" | "annual" } | null;
+
+const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+  pdf_guide:     { label: "PDF Guide",    icon: <FileText className="h-3.5 w-3.5" />, color: "text-sky-400 bg-sky-500/10 border-sky-500/30" },
+  course:        { label: "Course",       icon: <BookOpen className="h-3.5 w-3.5" />, color: "text-violet-400 bg-violet-500/10 border-violet-500/30" },
+  software_tool: { label: "Tool",         icon: <Wrench className="h-3.5 w-3.5" />,   color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
+  done_for_you:  { label: "Done-For-You", icon: <Package className="h-3.5 w-3.5" />,  color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
+  newsletter:    { label: "Newsletter",   icon: <Mail className="h-3.5 w-3.5" />,     color: "text-pink-400 bg-pink-500/10 border-pink-500/30" },
+  other:         { label: "Digital",      icon: <Sparkles className="h-3.5 w-3.5" />, color: "text-muted-foreground bg-surface border-border" },
 };
 
 const FILTER_TABS = [
-  { key: "all", label: "All Products" },
-  { key: "pdf_guide",     label: "PDF Guides" },
-  { key: "course",        label: "Courses" },
-  { key: "software_tool", label: "Tools" },
-  { key: "done_for_you",  label: "Done-For-You" },
-  { key: "newsletter",    label: "Newsletter" },
+  { key: "all",          label: "All" },
+  { key: "pdf_guide",    label: "PDF Guides" },
+  { key: "software_tool",label: "Tools" },
+  { key: "course",       label: "Courses" },
+  { key: "done_for_you", label: "Done-For-You" },
+  { key: "plans",        label: "Plans" },
 ];
 
-type CheckoutTarget = { id: string; title: string; price_zar: number } | null;
+const PLAN_ICONS: Record<string, React.ReactNode> = {
+  starter: <Zap className="h-5 w-5" />,
+  growth:  <TrendingUp className="h-5 w-5" />,
+  scale:   <Rocket className="h-5 w-5" />,
+};
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filter, setFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [checkoutTarget, setCheckoutTarget] = useState<CheckoutTarget>(null);
+export default function ShopPage() {
+  const [products, setProducts]         = useState<Product[]>([]);
+  const [plans, setPlans]               = useState<Plan[]>([]);
+  const [filter, setFilter]             = useState("all");
+  const [billing, setBilling]           = useState<"monthly" | "annual">("monthly");
+  const [loading, setLoading]           = useState(true);
+  const [checkoutProduct, setCheckoutProduct] = useState<CheckoutProduct>(null);
+  const [checkoutPlan, setCheckoutPlan]       = useState<CheckoutPlan>(null);
 
   useEffect(() => {
-    supabase
-      .from("products")
-      .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
-      .eq("is_published", true)
-      .order("sort_order", { ascending: true })
-      .then(({ data, error }) => {
-        if (!error) setProducts((data as Product[]) ?? []);
-        setLoading(false);
-      });
+    Promise.all([
+      supabase
+        .from("products")
+        .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("membership_plans")
+        .select("id, slug, name, tagline, price_monthly, price_annual, features, is_popular")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
+    ]).then(([{ data: prods }, { data: pls }]) => {
+      setProducts((prods as Product[]) ?? []);
+      const raw = (pls ?? []) as Array<Omit<Plan, "features"> & { features: unknown }>;
+      setPlans(
+        raw.map((p) => ({
+          ...p,
+          features: Array.isArray(p.features)
+            ? (p.features as string[])
+            : typeof p.features === "string"
+            ? (JSON.parse(p.features) as string[])
+            : [],
+        }))
+      );
+      setLoading(false);
+    });
   }, []);
 
-  const visible = filter === "all"
-    ? products
-    : products.filter((p) => p.type === filter);
+  const showPlans    = filter === "all" || filter === "plans";
+  const showProducts = filter !== "plans";
+  const visibleProducts = showProducts
+    ? filter === "all"
+      ? products
+      : products.filter((p) => p.type === filter)
+    : [];
 
   return (
     <div>
-      <PageHero
-        eyebrow="Digital Products"
-        title={<>Practical tools built for<br className="hidden sm:block" /> <span className="text-primary">South African businesses</span></>}
-        description="Buy once, download instantly. PDF guides, automation templates, video courses, and done-for-you packs designed to save you time and money."
-      >
-        <div className="flex flex-wrap gap-3">
-          <Link
-            to="/memberships"
-            className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20"
-          >
-            <Star className="h-3.5 w-3.5" /> View membership plans
-          </Link>
+      {/* ── Shop Hero ──────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-b border-border bg-background">
+        <div className="absolute inset-0 bg-grid opacity-50" aria-hidden />
+        <div className="absolute inset-0 bg-hero-glow" aria-hidden />
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <p className="font-mono text-xs uppercase tracking-widest text-primary">SKC Digital Shop</p>
+          <h1 className="mt-3 font-display text-4xl font-bold leading-tight sm:text-5xl">
+            Everything your business needs,
+            <br className="hidden sm:block" />
+            <span className="text-gradient"> in one place</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-muted-foreground">
+            PDF guides, Excel tools, courses, done-for-you packs and membership plans — all built
+            for South African businesses. Pay once, download instantly. No subscription unless you want one.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {[
+              { icon: <ShieldCheck className="h-4 w-4" />, text: "Secure via PayFast" },
+              { icon: <Download className="h-4 w-4" />,    text: "Instant download" },
+              { icon: <CreditCard className="h-4 w-4" />,  text: "Priced in ZAR" },
+              { icon: <Clock className="h-4 w-4" />,       text: "Once-off or monthly" },
+            ].map(({ icon, text }) => (
+              <span
+                key={text}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3.5 py-1.5 text-sm text-muted-foreground"
+              >
+                <span className="text-primary">{icon}</span>
+                {text}
+              </span>
+            ))}
+          </div>
         </div>
-      </PageHero>
+      </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      {/* ── Shop Body ──────────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Filter tabs */}
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mb-8 flex flex-wrap gap-2">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.key}
@@ -113,95 +175,169 @@ export default function ProductsPage() {
               }`}
             >
               {tab.label}
+              {tab.key === "plans" && (
+                <span className="ml-1.5 rounded-full bg-primary/20 px-1.5 py-0.5 text-[9px] text-primary">
+                  MONTHLY
+                </span>
+              )}
             </button>
           ))}
         </div>
 
-        {loading && (
+        {loading ? (
           <div className="flex min-h-[300px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
           </div>
-        )}
+        ) : (
+          <>
+            {/* Products grid */}
+            {showProducts && visibleProducts.length > 0 && (
+              <>
+                {filter === "all" && (
+                  <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                    Digital Products
+                  </p>
+                )}
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {visibleProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onBuy={() => setCheckoutProduct(product)}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
 
-        {!loading && products.length === 0 && (
-          <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border p-12 text-center">
-            <Sparkles className="h-10 w-10 text-primary" />
-            <h2 className="text-xl font-bold">Products launching soon</h2>
-            <p className="text-sm text-muted-foreground max-w-md">
-              We're building a library of practical digital products for South African entrepreneurs —
-              PDF guides, automation templates, video courses, and done-for-you packs.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
-              >
-                Get notified <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/memberships"
-                className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold hover:border-primary/40"
-              >
-                <Star className="h-3.5 w-3.5" /> View memberships
-              </Link>
+            {showProducts && visibleProducts.length === 0 && filter !== "all" && (
+              <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-16 text-center">
+                <Sparkles className="h-8 w-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No products in this category yet — check back soon.</p>
+              </div>
+            )}
+
+            {/* Membership plans */}
+            {showPlans && plans.length > 0 && (
+              <div className={showProducts && visibleProducts.length > 0 ? "mt-16 border-t border-border pt-14" : ""}>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-widest text-primary">Membership Plans</p>
+                    <h2 className="mt-1 text-2xl font-bold">Your digital team, on a flat monthly rate</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Ongoing services, priority support, and exclusive resources. No day-rate surprises.</p>
+                  </div>
+                  <div className="flex items-center gap-1 self-start rounded-full border border-border bg-surface/60 p-1 sm:self-auto">
+                    {(["monthly", "annual"] as const).map((b) => (
+                      <button
+                        key={b}
+                        onClick={() => setBilling(b)}
+                        className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                          billing === b
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {b === "monthly" ? "Monthly" : "Annual (−25%)"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-3">
+                  {plans.map((plan) => {
+                    const price =
+                      billing === "annual" && plan.price_annual
+                        ? Math.round(plan.price_annual / 12)
+                        : plan.price_monthly;
+                    return (
+                      <PlanCard
+                        key={plan.id}
+                        plan={plan}
+                        price={price}
+                        billing={billing}
+                        onBuy={() =>
+                          setCheckoutPlan({
+                            id: plan.id,
+                            slug: plan.slug,
+                            name: plan.name,
+                            price:
+                              billing === "annual" && plan.price_annual
+                                ? plan.price_annual
+                                : plan.price_monthly,
+                            billing,
+                          })
+                        }
+                      />
+                    );
+                  })}
+                </div>
+
+                <p className="mt-5 text-center text-xs text-muted-foreground">
+                  First payment by card via PayFast. Subsequent months invoiced via EFT.{" "}
+                  <Link to="/contact" className="text-primary hover:underline">
+                    Enterprise quotes available.
+                  </Link>
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* ── CTA band ───────────────────────────────────────── */}
+      {!loading && (
+        <section className="border-t border-border bg-surface/40">
+          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 px-8 py-12 text-center">
+              <p className="font-mono text-xs uppercase tracking-wider text-primary">Not sure what you need?</p>
+              <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Get a free digital strategy session</h2>
+              <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+                Book a free 15-minute call. We&apos;ll look at your business and tell you exactly which products
+                or plan will give you the best return.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90"
+                >
+                  Book free session <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 font-semibold hover:border-primary/40"
+                >
+                  View all services
+                </Link>
+              </div>
             </div>
           </div>
-        )}
-
-        {!loading && products.length > 0 && visible.length === 0 && (
-          <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
-            <Sparkles className="h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">No products in this category yet — check back soon.</p>
-          </div>
-        )}
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((product) => (
-            <ProductCard key={product.id} product={product} onBuy={() => setCheckoutTarget(product)} />
-          ))}
-        </div>
-      </section>
-
-      {/* Yoco checkout modal */}
-      {checkoutTarget && (
-        <CheckoutModal
-          product={checkoutTarget}
-          onClose={() => setCheckoutTarget(null)}
-        />
+        </section>
       )}
 
-      {/* Membership upsell banner */}
-      <section className="border-t border-border bg-surface/40">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 px-8 py-12 text-center">
-            <p className="font-mono text-xs uppercase tracking-wider text-primary">Members save more</p>
-            <h2 className="mt-3 text-2xl font-bold sm:text-3xl">
-              Get all products + ongoing support<br className="hidden sm:block" /> with a membership
-            </h2>
-            <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-              Starter, Growth, or Scale plans give you access to exclusive resources, priority support,
-              and ongoing digital services — from R499/month.
-            </p>
-            <Link
-              to="/memberships"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90"
-            >
-              View membership plans <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ── Checkout modals ────────────────────────────────── */}
+      {checkoutProduct && (
+        <ProductCheckoutModal
+          product={checkoutProduct}
+          onClose={() => setCheckoutProduct(null)}
+        />
+      )}
+      {checkoutPlan && (
+        <PlanCheckoutModal
+          plan={checkoutPlan}
+          onClose={() => setCheckoutPlan(null)}
+        />
+      )}
     </div>
   );
 }
 
+/* ── Product Card ─────────────────────────────────────────── */
 function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }) {
-  const typeInfo = TYPE_LABELS[product.type] ?? TYPE_LABELS.other;
-
+  const meta = TYPE_META[product.type] ?? TYPE_META.other;
   return (
-    <div className="group flex flex-col rounded-2xl border border-border bg-surface/40 overflow-hidden transition-all hover:border-primary/40 hover:shadow-lg">
+    <div className="group flex flex-col rounded-2xl border border-border bg-surface/30 overflow-hidden transition-all hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5">
       {/* Cover */}
-      <div className="relative flex h-44 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
+      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/8 to-transparent">
         {product.cover_url ? (
           <img
             src={product.cover_url}
@@ -209,17 +345,15 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
         ) : (
-          <div className="flex flex-col items-center gap-2 text-primary/40">
-            {typeInfo.icon}
-            <span className="font-mono text-[10px] uppercase tracking-wider">{typeInfo.label}</span>
+          <div className="flex flex-col items-center gap-2 text-primary/25">
+            <div className="scale-[2.5]">{meta.icon}</div>
           </div>
         )}
-        <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-border bg-background/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground backdrop-blur">
-          {typeInfo.icon}
-          {typeInfo.label}
+        <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider backdrop-blur ${meta.color}`}>
+          {meta.icon} {meta.label}
         </span>
         {product.is_free && (
-          <span className="absolute right-3 top-3 rounded-full bg-green-500 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white">
+          <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white">
             Free
           </span>
         )}
@@ -227,24 +361,29 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="font-bold leading-snug">{product.title}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{product.description}</p>
-
-        <div className="flex items-center justify-between pt-2">
-          <span className="text-xl font-bold">
-            {product.is_free ? "Free" : `R${product.price_zar.toLocaleString("en-ZA")}`}
+        <h3 className="text-sm font-bold leading-snug">{product.title}</h3>
+        <p className="flex-1 text-xs leading-relaxed text-muted-foreground line-clamp-3">
+          {product.description}
+        </p>
+        <div className="flex items-center justify-between border-t border-border/40 pt-3">
+          <span className="text-lg font-bold">
+            {product.is_free ? (
+              <span className="text-emerald-400">Free</span>
+            ) : (
+              `R${product.price_zar.toLocaleString("en-ZA")}`
+            )}
           </span>
           {product.is_free ? (
             <a
               href={`/contact?product=${encodeURIComponent(product.slug)}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
             >
-              <Download className="h-3.5 w-3.5" /> Get it free
+              <Download className="h-3.5 w-3.5" /> Get free
             </a>
           ) : (
             <button
               onClick={onBuy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-95"
             >
               <ShoppingCart className="h-3.5 w-3.5" /> Buy now
             </button>
@@ -255,11 +394,77 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
   );
 }
 
-function CheckoutModal({
+/* ── Plan Card ────────────────────────────────────────────── */
+function PlanCard({
+  plan, price, billing, onBuy,
+}: {
+  plan: Plan;
+  price: number;
+  billing: "monthly" | "annual";
+  onBuy: () => void;
+}) {
+  return (
+    <article
+      className={`relative flex flex-col rounded-2xl border p-7 ${
+        plan.is_popular
+          ? "border-primary/60 bg-surface shadow-lg shadow-primary/10"
+          : "border-border bg-surface/30"
+      }`}
+    >
+      {plan.is_popular && (
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 font-mono text-xs font-semibold text-primary-foreground">
+          Most Popular
+        </span>
+      )}
+
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+          plan.is_popular ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+        }`}
+      >
+        {PLAN_ICONS[plan.slug] ?? <Repeat className="h-5 w-5" />}
+      </div>
+
+      <h3 className="mt-4 font-display text-xl font-bold">{plan.name}</h3>
+      {plan.tagline && <p className="mt-1 text-sm text-muted-foreground">{plan.tagline}</p>}
+
+      <div className="mt-5">
+        <span className="font-display text-3xl font-bold">R{price.toLocaleString("en-ZA")}</span>
+        <span className="ml-1.5 text-sm text-muted-foreground">/month</span>
+      </div>
+      {billing === "annual" && (
+        <p className="mt-0.5 font-mono text-xs text-primary">Billed annually</p>
+      )}
+
+      <ul className="mt-5 flex-1 space-y-2.5">
+        {plan.features.map((f: string) => (
+          <li key={f} className="flex items-start gap-2.5 text-sm">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        onClick={onBuy}
+        className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity ${
+          plan.is_popular
+            ? "bg-primary text-primary-foreground hover:opacity-90"
+            : "border border-border bg-background hover:border-primary/40"
+        }`}
+      >
+        <CreditCard className="h-4 w-4" /> Get {plan.name}
+      </button>
+    </article>
+  );
+}
+
+/* ── Product checkout modal ───────────────────────────────── */
+function ProductCheckoutModal({
   product,
   onClose,
 }: {
-  product: CheckoutTarget & object;
+  product: NonNullable<CheckoutProduct>;
   onClose: () => void;
 }) {
   const [email, setEmail] = useState("");
@@ -270,27 +475,22 @@ function CheckoutModal({
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const res = await fetch("/api/payfast/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "product", itemId: product!.id, email }),
+        body: JSON.stringify({ type: "product", itemId: product.id, email }),
       });
-
       const data = await res.json() as {
         paymentUrl?: string;
         fields?: Record<string, string>;
         error?: string;
       };
-
       if (!res.ok || !data.paymentUrl || !data.fields) {
         setError(data.error ?? "Payment failed. Please try again.");
         setLoading(false);
         return;
       }
-
-      // Submit hidden form to PayFast hosted payment page
       submitPayFastForm(data.paymentUrl, data.fields);
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -299,61 +499,171 @@ function CheckoutModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-sm rounded-2xl border border-border bg-surface p-8 shadow-xl">
+    <CheckoutModal onClose={onClose}>
+      <p className="font-mono text-xs uppercase tracking-wider text-primary">Checkout</p>
+      <h2 className="mt-1 text-lg font-bold leading-snug">{product.title}</h2>
+      <p className="mt-1 text-2xl font-bold">R{product.price_zar.toLocaleString("en-ZA")}</p>
+      <p className="text-xs text-muted-foreground">Once-off · ZAR · Instant download after payment</p>
+
+      <form onSubmit={handlePay} className="mt-6 space-y-4">
+        <EmailInput value={email} onChange={setEmail} />
+        {error && <ErrorMsg text={error} />}
+        <SubmitBtn loading={loading}>
+          Pay R{product.price_zar.toLocaleString("en-ZA")}
+        </SubmitBtn>
+      </form>
+      <PayFastFooter />
+    </CheckoutModal>
+  );
+}
+
+/* ── Plan checkout modal ──────────────────────────────────── */
+function PlanCheckoutModal({
+  plan,
+  onClose,
+}: {
+  plan: NonNullable<CheckoutPlan>;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user?.email) setEmail(data.session.user.email);
+    });
+  }, []);
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/payfast/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "membership",
+          itemId: plan.id,
+          billing: plan.billing,
+          email,
+        }),
+      });
+      const data = await res.json() as {
+        paymentUrl?: string;
+        fields?: Record<string, string>;
+        error?: string;
+      };
+      if (!res.ok || !data.paymentUrl || !data.fields) {
+        setError(data.error ?? "Payment failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+      submitPayFastForm(data.paymentUrl, data.fields);
+    } catch {
+      setError("Network error. Please check your connection.");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <CheckoutModal onClose={onClose}>
+      <p className="font-mono text-xs uppercase tracking-wider text-primary">{plan.name} Membership</p>
+      <p className="mt-1 text-2xl font-bold">R{plan.price.toLocaleString("en-ZA")}</p>
+      <p className="text-xs text-muted-foreground">
+        {plan.billing === "annual" ? "Annual plan" : "First month"} · ZAR · Activates immediately
+      </p>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Subsequent months invoiced via EFT at the start of each billing cycle.
+      </p>
+
+      <form onSubmit={handlePay} className="mt-5 space-y-4">
+        <EmailInput value={email} onChange={setEmail} />
+        {error && <ErrorMsg text={error} />}
+        <SubmitBtn loading={loading}>
+          Pay R{plan.price.toLocaleString("en-ZA")}
+        </SubmitBtn>
+      </form>
+      <PayFastFooter />
+    </CheckoutModal>
+  );
+}
+
+/* ── Shared checkout atoms ────────────────────────────────── */
+function CheckoutModal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-sm rounded-2xl border border-border bg-surface p-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-md p-1 hover:bg-border"
+          className="absolute right-4 top-4 rounded-md p-1.5 hover:bg-border"
+          aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
-
-        <h2 className="font-bold text-lg leading-snug">{product!.title}</h2>
-        <p className="mt-1 text-2xl font-bold text-primary">
-          R{product!.price_zar.toLocaleString("en-ZA")}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Secure payment via Yoco · ZAR · Once-off
-        </p>
-
-        <form onSubmit={handlePay} className="mt-6 space-y-4">
-          <label className="block">
-            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-              Your email (for download link)
-            </span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
-            />
-          </label>
-
-          {error && (
-            <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
-          >
-            {loading ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> Redirecting to payment…</>
-            ) : (
-              <><ShoppingCart className="h-4 w-4" /> Pay R{product!.price_zar.toLocaleString("en-ZA")}</>
-            )}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          Powered by <span className="font-semibold">PayFast</span> · South African payment gateway
-        </p>
+        {children}
       </div>
     </div>
+  );
+}
+
+function EmailInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+        Email (for download link / receipt)
+      </span>
+      <input
+        type="email"
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="you@example.com"
+        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+      />
+    </label>
+  );
+}
+
+function ErrorMsg({ text }: { text: string }) {
+  return (
+    <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+      {text}
+    </p>
+  );
+}
+
+function SubmitBtn({ loading, children }: { loading: boolean; children: React.ReactNode }) {
+  return (
+    <button
+      type="submit"
+      disabled={loading}
+      className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" /> Redirecting to payment…
+        </>
+      ) : (
+        <>
+          <ShoppingCart className="h-4 w-4" /> {children}
+        </>
+      )}
+    </button>
+  );
+}
+
+function PayFastFooter() {
+  return (
+    <p className="mt-4 text-center text-[11px] text-muted-foreground">
+      Secured by <span className="font-semibold">PayFast</span> · South African payment gateway
+    </p>
   );
 }
