@@ -117,59 +117,61 @@ export const Route = createFileRoute("/api/quote")({
             ]
           : undefined;
 
-        // 1. Send the lead notification to SKC Digital (with PDF copy)
-        const internalRes = await fetch(`${RESEND_URL}/emails`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "SKC Digital <noreply@skcdigital.co.za>",
-            to: ["info@skcdigital.co.za"],
-            reply_to: email,
-            subject: internalSubject,
-            html: internalHtml,
-            attachments,
-          }),
-        });
+        // Use onboarding@resend.dev — works without domain verification.
+        // reply_to ensures replies land in the right inbox.
+        const FROM = "SKC Digital <onboarding@resend.dev>";
 
-        const internalData = await internalRes.json().catch(() => ({}));
-        if (!internalRes.ok) {
-          console.error("Resend internal send failed", internalRes.status, internalData);
-          return Response.json(
-            { error: "Failed to send email. Please WhatsApp us instead." },
-            { status: 502 },
-          );
+        async function sendEmail(payload: Record<string, unknown>) {
+          const r = await fetch(`${RESEND_URL}/emails`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify(payload),
+          });
+          if (!r.ok) {
+            const body = await r.json().catch(() => ({}));
+            console.error("Resend error", r.status, body);
+          }
+          return r;
         }
 
-        // 2. Send confirmation + PDF receipt to the customer
+        // 1. Notify SKC Digital
+        const internalRes = await sendEmail({
+          from: FROM,
+          to: ["info@skcdigital.co.za"],
+          reply_to: email,
+          subject: internalSubject,
+          html: internalHtml,
+          attachments,
+        });
+
+        if (!internalRes.ok) {
+          // Lead is already saved in Supabase — return partial success so
+          // the frontend can open WhatsApp as backup.
+          return Response.json({ ok: true, emailSent: false });
+        }
+
+        // 2. Confirm to the customer
         const customerHtml = `
           <div style="font-family:Arial,sans-serif;font-size:14px;color:#1a1a1a;line-height:1.6">
             <p>Hi ${escapeHtml(name)},</p>
-            <p>Thanks for reaching out to <strong>SKC Digital</strong>. We have received your quote request and a copy is attached as a PDF for your records.</p>
-            <p>We&rsquo;ll reply on WhatsApp or by email within <strong>4 working hours</strong> with a fixed quote and timeline.</p>
-            <p style="margin-top:24px">If you need anything urgent, WhatsApp us on <a href="https://wa.me/27673793503">+27 67 379 3503</a>.</p>
+            <p>Thanks for reaching out to <strong>SKC Digital</strong>. We&rsquo;ve received your quote request and will reply within <strong>4 working hours</strong>.</p>
+            <p style="margin-top:24px">Need something urgently? WhatsApp us at <a href="https://wa.me/27673793503">+27 67 379 3503</a>.</p>
             <p style="margin-top:24px">Best regards,<br/>Suzan &mdash; SKC Digital<br/><a href="https://www.skcdigital.co.za">skcdigital.co.za</a></p>
           </div>
         `;
-        await fetch(`${RESEND_URL}/emails`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: "SKC Digital <noreply@skcdigital.co.za>",
-            to: [email],
-            reply_to: "info@skcdigital.co.za",
-            subject: "We received your quote request — SKC Digital",
-            html: customerHtml,
-            attachments,
-          }),
-        }).catch((err) => console.error("Customer confirmation failed", err));
+        await sendEmail({
+          from: FROM,
+          to: [email],
+          reply_to: "info@skcdigital.co.za",
+          subject: "We received your quote request — SKC Digital",
+          html: customerHtml,
+          attachments,
+        });
 
-        return Response.json({ ok: true });
+        return Response.json({ ok: true, emailSent: true });
       },
     },
   },
