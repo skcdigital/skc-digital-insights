@@ -71,8 +71,8 @@ export default function ProductsPage() {
       .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
       .eq("is_published", true)
       .order("sort_order", { ascending: true })
-      .then(({ data }) => {
-        setProducts((data as Product[]) ?? []);
+      .then(({ data, error }) => {
+        if (!error) setProducts((data as Product[]) ?? []);
         setLoading(false);
       });
   }, []);
@@ -122,12 +122,35 @@ export default function ProductsPage() {
           </div>
         )}
 
-        {!loading && visible.length === 0 && (
+        {!loading && products.length === 0 && (
+          <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border p-12 text-center">
+            <Sparkles className="h-10 w-10 text-primary" />
+            <h2 className="text-xl font-bold">Products launching soon</h2>
+            <p className="text-sm text-muted-foreground max-w-md">
+              We're building a library of practical digital products for South African entrepreneurs —
+              PDF guides, automation templates, video courses, and done-for-you packs.
+            </p>
+            <div className="flex flex-wrap justify-center gap-3 pt-2">
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              >
+                Get notified <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/memberships"
+                className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-semibold hover:border-primary/40"
+              >
+                <Star className="h-3.5 w-3.5" /> View memberships
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {!loading && products.length > 0 && visible.length === 0 && (
           <div className="flex min-h-[300px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border py-20 text-center">
             <Sparkles className="h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              No products in this category yet — check back soon.
-            </p>
+            <p className="text-sm text-muted-foreground">No products in this category yet — check back soon.</p>
           </div>
         )}
 
@@ -136,24 +159,6 @@ export default function ProductsPage() {
             <ProductCard key={product.id} product={product} onBuy={() => setCheckoutTarget(product)} />
           ))}
         </div>
-
-        {/* Empty state CTA for no products at all */}
-        {!loading && products.length === 0 && (
-          <div className="mt-16 rounded-2xl border border-dashed border-border p-12 text-center">
-            <Sparkles className="mx-auto h-10 w-10 text-primary" />
-            <h2 className="mt-4 text-xl font-bold">Products launching soon</h2>
-            <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-              We're building a library of practical digital products for South African entrepreneurs.
-              Join our newsletter to be first to know.
-            </p>
-            <Link
-              to="/contact"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
-            >
-              Get notified <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        )}
       </section>
 
       {/* Yoco checkout modal */}
