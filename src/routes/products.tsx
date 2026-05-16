@@ -25,6 +25,34 @@ export const Route = createFileRoute("/products")({
       { name: "twitter:description", content: DESC },
     ],
   }),
+  // Runs on the server — products are in the HTML before JavaScript loads
+  loader: async () => {
+    const [{ data: prods }, { data: pls }] = await Promise.all([
+      supabase
+        .from("products")
+        .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
+        .eq("is_published", true)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("membership_plans")
+        .select("id, slug, name, tagline, price_monthly, price_annual, features, is_popular")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true }),
+    ]);
+
+    const products = (prods ?? []) as Product[];
+    const raw = (pls ?? []) as Array<Omit<Plan, "features"> & { features: unknown }>;
+    const plans: Plan[] = raw.map((p) => ({
+      ...p,
+      features: Array.isArray(p.features)
+        ? (p.features as string[])
+        : typeof p.features === "string"
+        ? (JSON.parse(p.features) as string[])
+        : [],
+    }));
+
+    return { products, plans };
+  },
   component: ShopPage,
 });
 
@@ -79,60 +107,13 @@ const PLAN_ICONS: Record<string, React.ReactNode> = {
 };
 
 export default function ShopPage() {
-  const [products, setProducts]         = useState<Product[]>([]);
-  const [plans, setPlans]               = useState<Plan[]>([]);
+  // Products and plans come from the server-side loader — already in the HTML.
+  const { products, plans } = Route.useLoaderData();
+
   const [filter, setFilter]             = useState("all");
   const [billing, setBilling]           = useState<"monthly" | "annual">("monthly");
-  const [loading, setLoading]           = useState(true);
   const [checkoutProduct, setCheckoutProduct] = useState<CheckoutProduct>(null);
   const [checkoutPlan, setCheckoutPlan]       = useState<CheckoutPlan>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const [{ data: prods, error: prodErr }, { data: pls, error: planErr }] =
-          await Promise.all([
-            supabase
-              .from("products")
-              .select("id, slug, title, description, type, price_zar, cover_url, is_free, sort_order")
-              .eq("is_published", true)
-              .order("sort_order", { ascending: true }),
-            supabase
-              .from("membership_plans")
-              .select("id, slug, name, tagline, price_monthly, price_annual, features, is_popular")
-              .eq("is_active", true)
-              .order("sort_order", { ascending: true }),
-          ]);
-
-        if (cancelled) return;
-
-        if (prodErr) console.error("products:", prodErr.message);
-        if (planErr) console.error("plans:", planErr.message);
-
-        setProducts((prods as Product[]) ?? []);
-        const raw = (pls ?? []) as Array<Omit<Plan, "features"> & { features: unknown }>;
-        setPlans(
-          raw.map((p) => ({
-            ...p,
-            features: Array.isArray(p.features)
-              ? (p.features as string[])
-              : typeof p.features === "string"
-              ? (JSON.parse(p.features) as string[])
-              : [],
-          }))
-        );
-      } catch (err) {
-        if (!cancelled) console.error("shop load failed:", err);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    void load();
-    return () => { cancelled = true; };
-  }, []);
 
   const showPlans    = filter === "all" || filter === "plans";
   const showProducts = filter !== "plans";
@@ -202,12 +183,7 @@ export default function ShopPage() {
           ))}
         </div>
 
-        {loading ? (
-          <div className="flex min-h-[300px] items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-          </div>
-        ) : (
-          <>
+        <>
             {/* Products grid */}
             {showProducts && visibleProducts.length > 0 && (
               <>
@@ -302,13 +278,11 @@ export default function ShopPage() {
                 </p>
               </div>
             )}
-          </>
-        )}
+        </>
       </section>
 
       {/* ── CTA band ───────────────────────────────────────── */}
-      {!loading && (
-        <section className="border-t border-border bg-surface/40">
+      <section className="border-t border-border bg-surface/40">
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <div className="rounded-2xl border border-primary/20 bg-primary/5 px-8 py-12 text-center">
               <p className="font-mono text-xs uppercase tracking-wider text-primary">Not sure what you need?</p>
@@ -334,7 +308,6 @@ export default function ShopPage() {
             </div>
           </div>
         </section>
-      )}
 
       {/* ── Checkout modals ────────────────────────────────── */}
       {checkoutProduct && (

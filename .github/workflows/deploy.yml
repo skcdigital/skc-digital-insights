@@ -25,6 +25,7 @@ jobs:
           VITE_ADMIN_EMAILS: "info@skcdigital.co.za,suzankwinika0@gmail.com"
 
       - name: Inject runtime env vars into wrangler config
+        continue-on-error: true
         run: node scripts/patch-wrangler.js
         env:
           RESEND_API_KEY: "re_G2fzGzrg_KHvWGqWFhAtmRKWawhujrdh6"

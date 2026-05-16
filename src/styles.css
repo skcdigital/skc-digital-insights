@@ -221,10 +221,10 @@
     to { height: 0; }
   }
   .animate-accordion-down {
-    animation: accordion-down 0.2s ease-out;
+    animation: accordion-down 0.2s ease-out forwards;
   }
   .animate-accordion-up {
-    animation: accordion-up 0.2s ease-out;
+    animation: accordion-up 0.2s ease-out forwards;
   }
 
   @keyframes marquee {
