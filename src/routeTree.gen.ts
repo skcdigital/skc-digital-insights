@@ -47,6 +47,8 @@ import { Route as AdminCreditNotesRouteImport } from './routes/admin.credit-note
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
 import { Route as ApiYocoWebhookRouteImport } from './routes/api/yoco/webhook'
 import { Route as ApiYocoCheckoutRouteImport } from './routes/api/yoco/checkout'
+import { Route as ApiPayfastNotifyRouteImport } from './routes/api/payfast/notify'
+import { Route as ApiPayfastCheckoutRouteImport } from './routes/api/payfast/checkout'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
 import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
@@ -246,6 +248,16 @@ const ApiYocoCheckoutRoute = ApiYocoCheckoutRouteImport.update({
   path: '/api/yoco/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPayfastNotifyRoute = ApiPayfastNotifyRouteImport.update({
+  id: '/api/payfast/notify',
+  path: '/api/payfast/notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPayfastCheckoutRoute = ApiPayfastCheckoutRouteImport.update({
+  id: '/api/payfast/checkout',
+  path: '/api/payfast/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   id: '/api/auth/signup',
   path: '/api/auth/signup',
@@ -332,6 +344,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
+  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
   '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
   '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
@@ -378,6 +392,8 @@ export interface FileRoutesByTo {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
+  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
   '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
   '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
@@ -427,6 +443,8 @@ export interface FileRoutesById {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
+  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
   '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
   '/api/yoco/webhook': typeof ApiYocoWebhookRoute
 }
@@ -477,6 +495,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/payfast/checkout'
+    | '/api/payfast/notify'
     | '/api/yoco/checkout'
     | '/api/yoco/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -523,6 +543,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/payfast/checkout'
+    | '/api/payfast/notify'
     | '/api/yoco/checkout'
     | '/api/yoco/webhook'
   id:
@@ -571,6 +593,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/payfast/checkout'
+    | '/api/payfast/notify'
     | '/api/yoco/checkout'
     | '/api/yoco/webhook'
   fileRoutesById: FileRoutesById
@@ -604,6 +628,8 @@ export interface RootRouteChildren {
   ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiPayfastCheckoutRoute: typeof ApiPayfastCheckoutRoute
+  ApiPayfastNotifyRoute: typeof ApiPayfastNotifyRoute
   ApiYocoCheckoutRoute: typeof ApiYocoCheckoutRoute
   ApiYocoWebhookRoute: typeof ApiYocoWebhookRoute
 }
@@ -876,6 +902,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiYocoCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/payfast/notify': {
+      id: '/api/payfast/notify'
+      path: '/api/payfast/notify'
+      fullPath: '/api/payfast/notify'
+      preLoaderRoute: typeof ApiPayfastNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/payfast/checkout': {
+      id: '/api/payfast/checkout'
+      path: '/api/payfast/checkout'
+      fullPath: '/api/payfast/checkout'
+      preLoaderRoute: typeof ApiPayfastCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/signup': {
       id: '/api/auth/signup'
       path: '/api/auth/signup'
@@ -1061,6 +1101,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiPayfastCheckoutRoute: ApiPayfastCheckoutRoute,
+  ApiPayfastNotifyRoute: ApiPayfastNotifyRoute,
   ApiYocoCheckoutRoute: ApiYocoCheckoutRoute,
   ApiYocoWebhookRoute: ApiYocoWebhookRoute,
 }

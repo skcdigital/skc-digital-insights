@@ -6,11 +6,21 @@
   "main": "@tanstack/react-start/server-entry",
   // Runtime secrets — set via: npx wrangler secret put YOCO_SECRET_KEY
   // Or add in Cloudflare dashboard → Workers & Pages → skc-digital-insights → Settings → Variables
-  // Required secrets:
-  //   SUPABASE_URL            — Supabase project URL
+  // Required secrets — add via Cloudflare dashboard:
+  //   Workers & Pages → skc-digital-insights → Settings → Variables and Secrets
+  //
+  //   SUPABASE_URL              — https://abucbojsosfxdaufdapw.supabase.co
   //   SUPABASE_SERVICE_ROLE_KEY — Supabase service role key
-  //   RESEND_API_KEY          — Email sending (Resend.com)
-  //   YOCO_SECRET_KEY         — Yoco secret key (from Yoco developer portal → API Keys)
-  //   YOCO_WEBHOOK_SECRET     — Yoco webhook secret (from Yoco developer portal → Webhooks)
-  //   SITE_URL                — https://www.skcdigital.co.za
+  //   RESEND_API_KEY            — Email sending (Resend.com)
+  //   SITE_URL                  — https://www.skcdigital.co.za
+  //
+  //   PayFast (payfast.co.za → Merchant Dashboard → Integration):
+  //   PAYFAST_MERCHANT_ID       — Your Merchant ID (numeric)
+  //   PAYFAST_MERCHANT_KEY      — Your Merchant Key
+  //   PAYFAST_PASSPHRASE        — Your passphrase (set in PayFast account settings)
+  //   PAYFAST_SANDBOX           — "true" for testing, "false" for live (default: false)
+  //
+  //   Yoco (optional — enable later if needed):
+  //   YOCO_SECRET_KEY           — Yoco secret key
+  //   YOCO_WEBHOOK_SECRET       — Yoco webhook secret
 }

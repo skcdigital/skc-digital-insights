@@ -5,6 +5,7 @@ import { PageHero } from "@/components/page-hero";
 import { SITE } from "@/lib/site";
 import { TrackedWALink } from "@/components/tracked-wa-link";
 import { supabase } from "@/integrations/supabase/client";
+import { submitPayFastForm } from "@/lib/payfast";
 
 const TITLE = "Membership Plans — SKC Digital";
 const DESC =
@@ -356,7 +357,7 @@ function MembershipCheckoutModal({
         return;
       }
 
-      const res = await fetch("/api/yoco/checkout", {
+      const res = await fetch("/api/payfast/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -364,19 +365,22 @@ function MembershipCheckoutModal({
           itemId: (planRow as { id: string }).id,
           billing: plan.billing,
           email,
-          idempotencyKey: `membership-${plan.slug}-${email}-${Date.now()}`,
         }),
       });
 
-      const data = await res.json() as { redirectUrl?: string; error?: string };
+      const data = await res.json() as {
+        paymentUrl?: string;
+        fields?: Record<string, string>;
+        error?: string;
+      };
 
-      if (!res.ok || !data.redirectUrl) {
+      if (!res.ok || !data.paymentUrl || !data.fields) {
         setError(data.error ?? "Payment failed. Please try again.");
         setLoading(false);
         return;
       }
 
-      window.location.href = data.redirectUrl;
+      submitPayFastForm(data.paymentUrl, data.fields);
     } catch {
       setError("Network error. Please check your connection and try again.");
       setLoading(false);
@@ -437,7 +441,7 @@ function MembershipCheckoutModal({
         </form>
 
         <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          Powered by <span className="font-semibold">Yoco</span> · South African payment gateway
+          Powered by <span className="font-semibold">PayFast</span> · South African payment gateway
         </p>
       </div>
     </div>

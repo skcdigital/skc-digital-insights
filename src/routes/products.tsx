@@ -4,6 +4,7 @@ import {
   FileText, BookOpen, Wrench, Package, Mail, Sparkles,
   ShoppingCart, Download, ArrowRight, Star, X, Loader2,
 } from "lucide-react";
+import { submitPayFastForm } from "@/lib/payfast";
 import { PageHero } from "@/components/page-hero";
 import { SITE } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
@@ -271,27 +272,26 @@ function CheckoutModal({
     setLoading(true);
 
     try {
-      const res = await fetch("/api/yoco/checkout", {
+      const res = await fetch("/api/payfast/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "product",
-          itemId: product!.id,
-          email,
-          idempotencyKey: `${product!.id}-${email}-${Date.now()}`,
-        }),
+        body: JSON.stringify({ type: "product", itemId: product!.id, email }),
       });
 
-      const data = await res.json() as { redirectUrl?: string; error?: string };
+      const data = await res.json() as {
+        paymentUrl?: string;
+        fields?: Record<string, string>;
+        error?: string;
+      };
 
-      if (!res.ok || !data.redirectUrl) {
+      if (!res.ok || !data.paymentUrl || !data.fields) {
         setError(data.error ?? "Payment failed. Please try again.");
         setLoading(false);
         return;
       }
 
-      // Redirect to Yoco hosted payment page
-      window.location.href = data.redirectUrl;
+      // Submit hidden form to PayFast hosted payment page
+      submitPayFastForm(data.paymentUrl, data.fields);
     } catch {
       setError("Network error. Please check your connection and try again.");
       setLoading(false);
@@ -351,7 +351,7 @@ function CheckoutModal({
         </form>
 
         <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          Powered by <span className="font-semibold">Yoco</span> · South African payment gateway
+          Powered by <span className="font-semibold">PayFast</span> · South African payment gateway
         </p>
       </div>
     </div>
