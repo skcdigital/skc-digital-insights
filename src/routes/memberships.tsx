@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Zap, TrendingUp, Rocket, ArrowRight, MessageCircle, HelpCircle, X, Loader2, CreditCard } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
@@ -97,7 +97,7 @@ const PLANS = [
 const FAQS = [
   {
     q: "How does billing work?",
-    a: "We invoice via EFT in South African Rand at the start of each month (or annually upfront for the discounted rate). Stripe card billing is coming soon.",
+    a: "Pay your first month by card via PayFast, then we invoice via EFT in South African Rand at the start of each subsequent month (or annually upfront for the discounted rate).",
   },
   {
     q: "Can I upgrade or downgrade my plan?",
@@ -234,7 +234,7 @@ function MembershipsPage() {
 
         {/* Compare note */}
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          All plans invoiced via EFT in ZAR. Card payments coming soon.{" "}
+          Pay by card via PayFast or enquire about EFT.{" "}
           <Link to="/contact" className="text-primary hover:underline">Custom enterprise quotes available.</Link>
         </p>
       </section>
@@ -332,11 +332,11 @@ function MembershipCheckoutModal({
   const [error, setError] = useState("");
 
   // Pre-fill email if user is signed in
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session?.user?.email) setEmail(data.session.user.email);
     });
-  });
+  }, []);
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
