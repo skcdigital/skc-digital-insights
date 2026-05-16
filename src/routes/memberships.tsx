@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Zap, TrendingUp, Rocket, ArrowRight, MessageCircle, HelpCircle, X, Loader2, CreditCard } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
