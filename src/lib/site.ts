@@ -16,8 +16,9 @@ export const waLink = (text: string) =>
 export const NAV: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/", label: "Home", exact: true },
   { to: "/services", label: "Services" },
+  { to: "/products", label: "Products" },
+  { to: "/memberships", label: "Memberships" },
   { to: "/portfolio", label: "Portfolio" },
-  { to: "/demos", label: "Demos" },
   { to: "/pricing", label: "Pricing" },
   { to: "/care-plans", label: "Care Plans" },
   { to: "/blog", label: "Blog" },

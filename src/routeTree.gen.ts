@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as MembershipsRouteImport } from './routes/memberships'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FreeAuditRouteImport } from './routes/free-audit'
 import { Route as DemosRouteImport } from './routes/demos'
@@ -28,6 +30,7 @@ import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalServiceAgreementRouteImport } from './routes/legal.service-agreement'
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
@@ -35,10 +38,14 @@ import { Route as ApiQuoteRouteImport } from './routes/api/quote'
 import { Route as ApiBlogPdfRouteImport } from './routes/api/blog-pdf'
 import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminMembershipsRouteImport } from './routes/admin.memberships'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminInvoicesRouteImport } from './routes/admin.invoices'
 import { Route as AdminCreditNotesRouteImport } from './routes/admin.credit-notes'
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe/webhook'
+import { Route as ApiStripeCheckoutRouteImport } from './routes/api/stripe/checkout'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
 import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
@@ -53,6 +60,11 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -61,6 +73,11 @@ const PricingRoute = PricingRouteImport.update({
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembershipsRoute = MembershipsRouteImport.update({
+  id: '/memberships',
+  path: '/memberships',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -143,6 +160,11 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -178,6 +200,16 @@ const AdminQuotesRoute = AdminQuotesRouteImport.update({
   path: '/quotes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMembershipsRoute = AdminMembershipsRouteImport.update({
+  id: '/memberships',
+  path: '/memberships',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -197,6 +229,16 @@ const AdminChatsRoute = AdminChatsRouteImport.update({
   id: '/chats',
   path: '/chats',
   getParentRoute: () => AdminRoute,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe/webhook',
+  path: '/api/stripe/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStripeCheckoutRoute = ApiStripeCheckoutRouteImport.update({
+  id: '/api/stripe/checkout',
+  path: '/api/stripe/checkout',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
   id: '/api/auth/signup',
@@ -250,13 +292,17 @@ export interface FileRoutesByFullPath {
   '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
+  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/memberships': typeof AdminMembershipsRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
@@ -264,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
@@ -278,6 +325,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -288,13 +337,17 @@ export interface FileRoutesByTo {
   '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
+  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/memberships': typeof AdminMembershipsRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
@@ -302,6 +355,7 @@ export interface FileRoutesByTo {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
@@ -316,6 +370,8 @@ export interface FileRoutesByTo {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -329,13 +385,17 @@ export interface FileRoutesById {
   '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
+  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
   '/admin/invoices': typeof AdminInvoicesRouteWithChildren
   '/admin/leads': typeof AdminLeadsRouteWithChildren
+  '/admin/memberships': typeof AdminMembershipsRoute
+  '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
   '/api/blog-pdf': typeof ApiBlogPdfRoute
@@ -343,6 +403,7 @@ export interface FileRoutesById {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
@@ -357,6 +418,8 @@ export interface FileRoutesById {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,13 +434,17 @@ export interface FileRouteTypes {
     | '/demos'
     | '/free-audit'
     | '/login'
+    | '/memberships'
     | '/portfolio'
     | '/pricing'
+    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
+    | '/admin/memberships'
+    | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
     | '/api/blog-pdf'
@@ -385,6 +452,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
@@ -399,6 +467,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/stripe/checkout'
+    | '/api/stripe/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -409,13 +479,17 @@ export interface FileRouteTypes {
     | '/demos'
     | '/free-audit'
     | '/login'
+    | '/memberships'
     | '/portfolio'
     | '/pricing'
+    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
+    | '/admin/memberships'
+    | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
     | '/api/blog-pdf'
@@ -423,6 +497,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
@@ -437,6 +512,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/stripe/checkout'
+    | '/api/stripe/webhook'
   id:
     | '__root__'
     | '/'
@@ -449,13 +526,17 @@ export interface FileRouteTypes {
     | '/demos'
     | '/free-audit'
     | '/login'
+    | '/memberships'
     | '/portfolio'
     | '/pricing'
+    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
     | '/admin/invoices'
     | '/admin/leads'
+    | '/admin/memberships'
+    | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
     | '/api/blog-pdf'
@@ -463,6 +544,7 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
+    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
@@ -477,6 +559,8 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
+    | '/api/stripe/checkout'
+    | '/api/stripe/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -490,13 +574,16 @@ export interface RootRouteChildren {
   DemosRoute: typeof DemosRoute
   FreeAuditRoute: typeof FreeAuditRoute
   LoginRoute: typeof LoginRoute
+  MembershipsRoute: typeof MembershipsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
+  ProductsRoute: typeof ProductsRoute
   ServicesRoute: typeof ServicesRoute
   ApiBlogPdfRoute: typeof ApiBlogPdfRoute
   ApiQuoteRoute: typeof ApiQuoteRoute
   ApiSendDocRoute: typeof ApiSendDocRoute
   ApiTrackRoute: typeof ApiTrackRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
   LegalServiceAgreementRoute: typeof LegalServiceAgreementRoute
@@ -504,6 +591,8 @@ export interface RootRouteChildren {
   ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -513,6 +602,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -527,6 +623,13 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memberships': {
+      id: '/memberships'
+      path: '/memberships'
+      fullPath: '/memberships'
+      preLoaderRoute: typeof MembershipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -641,6 +744,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/$slug': {
       id: '/blog/$slug'
       path: '/$slug'
@@ -690,6 +800,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminQuotesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/memberships': {
+      id: '/admin/memberships'
+      path: '/memberships'
+      fullPath: '/admin/memberships'
+      preLoaderRoute: typeof AdminMembershipsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/leads': {
       id: '/admin/leads'
       path: '/leads'
@@ -717,6 +841,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/chats'
       preLoaderRoute: typeof AdminChatsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/api/stripe/webhook': {
+      id: '/api/stripe/webhook'
+      path: '/api/stripe/webhook'
+      fullPath: '/api/stripe/webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe/checkout': {
+      id: '/api/stripe/checkout'
+      path: '/api/stripe/checkout'
+      fullPath: '/api/stripe/checkout'
+      preLoaderRoute: typeof ApiStripeCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/signup': {
       id: '/api/auth/signup'
@@ -841,6 +979,8 @@ interface AdminRouteChildren {
   AdminCreditNotesRoute: typeof AdminCreditNotesRouteWithChildren
   AdminInvoicesRoute: typeof AdminInvoicesRouteWithChildren
   AdminLeadsRoute: typeof AdminLeadsRouteWithChildren
+  AdminMembershipsRoute: typeof AdminMembershipsRoute
+  AdminProductsRoute: typeof AdminProductsRoute
   AdminQuotesRoute: typeof AdminQuotesRouteWithChildren
   AdminTicketsRoute: typeof AdminTicketsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -851,6 +991,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCreditNotesRoute: AdminCreditNotesRouteWithChildren,
   AdminInvoicesRoute: AdminInvoicesRouteWithChildren,
   AdminLeadsRoute: AdminLeadsRouteWithChildren,
+  AdminMembershipsRoute: AdminMembershipsRoute,
+  AdminProductsRoute: AdminProductsRoute,
   AdminQuotesRoute: AdminQuotesRouteWithChildren,
   AdminTicketsRoute: AdminTicketsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
@@ -881,13 +1023,16 @@ const rootRouteChildren: RootRouteChildren = {
   DemosRoute: DemosRoute,
   FreeAuditRoute: FreeAuditRoute,
   LoginRoute: LoginRoute,
+  MembershipsRoute: MembershipsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
+  ProductsRoute: ProductsRoute,
   ServicesRoute: ServicesRoute,
   ApiBlogPdfRoute: ApiBlogPdfRoute,
   ApiQuoteRoute: ApiQuoteRoute,
   ApiSendDocRoute: ApiSendDocRoute,
   ApiTrackRoute: ApiTrackRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
   LegalServiceAgreementRoute: LegalServiceAgreementRoute,
@@ -895,6 +1040,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

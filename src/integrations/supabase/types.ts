@@ -643,6 +643,264 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          description: string
+          type: string
+          price_zar: number
+          currency: string
+          stripe_price_id: string | null
+          cover_url: string | null
+          preview_url: string | null
+          is_published: boolean
+          is_free: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          title: string
+          description: string
+          type: string
+          price_zar?: number
+          currency?: string
+          stripe_price_id?: string | null
+          cover_url?: string | null
+          preview_url?: string | null
+          is_published?: boolean
+          is_free?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          description?: string
+          type?: string
+          price_zar?: number
+          currency?: string
+          stripe_price_id?: string | null
+          cover_url?: string | null
+          preview_url?: string | null
+          is_published?: boolean
+          is_free?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_files: {
+        Row: {
+          id: string
+          product_id: string
+          label: string
+          storage_path: string
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          label: string
+          storage_path: string
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          label?: string
+          storage_path?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      membership_plans: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          tagline: string | null
+          price_monthly: number
+          price_annual: number | null
+          currency: string
+          stripe_price_monthly: string | null
+          stripe_price_annual: string | null
+          features: string[]
+          is_popular: boolean
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          tagline?: string | null
+          price_monthly?: number
+          price_annual?: number | null
+          currency?: string
+          stripe_price_monthly?: string | null
+          stripe_price_annual?: string | null
+          features?: string[]
+          is_popular?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          tagline?: string | null
+          price_monthly?: number
+          price_annual?: number | null
+          currency?: string
+          stripe_price_monthly?: string | null
+          stripe_price_annual?: string | null
+          features?: string[]
+          is_popular?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_memberships: {
+        Row: {
+          id: string
+          user_id: string
+          plan_id: string
+          status: string
+          billing_interval: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          current_period_start: string | null
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_id: string
+          status?: string
+          billing_interval?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_id?: string
+          status?: string
+          billing_interval?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          id: string
+          user_id: string | null
+          product_id: string
+          email: string
+          amount_zar: number
+          status: string
+          stripe_session_id: string | null
+          stripe_payment_intent: string | null
+          download_token: string | null
+          download_expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          product_id: string
+          email: string
+          amount_zar: number
+          status?: string
+          stripe_session_id?: string | null
+          stripe_payment_intent?: string | null
+          download_token?: string | null
+          download_expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          product_id?: string
+          email?: string
+          amount_zar?: number
+          status?: string
+          stripe_session_id?: string | null
+          stripe_payment_intent?: string | null
+          download_token?: string | null
+          download_expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          id: string
+          email: string
+          name: string | null
+          tags: string[]
+          is_active: boolean
+          source: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          name?: string | null
+          tags?: string[]
+          is_active?: boolean
+          source?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          name?: string | null
+          tags?: string[]
+          is_active?: boolean
+          source?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -672,6 +930,10 @@ export type Database = {
         | "other"
       lead_status: "new" | "contacted" | "quoted" | "won" | "lost"
       quote_status: "draft" | "sent" | "accepted" | "declined" | "expired"
+      product_type: "pdf_guide" | "course" | "software_tool" | "done_for_you" | "newsletter" | "other"
+      billing_interval: "monthly" | "annual" | "once"
+      membership_status: "active" | "past_due" | "cancelled" | "trialing" | "paused"
+      purchase_status: "pending" | "completed" | "refunded" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never

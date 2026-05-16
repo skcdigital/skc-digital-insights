@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
-import { LayoutDashboard, Users, FileText, Receipt, MessageSquare, TicketIcon, RotateCcw, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Receipt, MessageSquare, TicketIcon, RotateCcw, LogOut, ExternalLink, Package, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Logo } from "@/components/logo";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -55,8 +54,28 @@ function AdminLayout() {
       </div>
     );
   }
-  if (!user || isAdmin === false) {
-    return <SignInGate />;
+  if (!user) {
+    window.location.href = "/login";
+    return null;
+  }
+  if (isAdmin === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8 text-center">
+          <Logo />
+          <h1 className="mt-6 font-display text-xl font-bold">Access denied</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your account doesn't have admin privileges. Contact SKC Digital to request access.
+          </p>
+          <a
+            href="/login"
+            className="mt-6 inline-block rounded-lg border border-border px-4 py-2 text-sm hover:border-primary/40"
+          >
+            Sign in with a different account
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -90,6 +109,8 @@ function AdminLayout() {
             <NavItem to="/admin/quotes" icon={<FileText className="h-4 w-4" />}>Quotes</NavItem>
             <NavItem to="/admin/invoices" icon={<Receipt className="h-4 w-4" />}>Invoices</NavItem>
             <NavItem to="/admin/credit-notes" icon={<RotateCcw className="h-4 w-4" />}>Credit Notes</NavItem>
+            <NavItem to="/admin/products" icon={<Package className="h-4 w-4" />}>Products</NavItem>
+            <NavItem to="/admin/memberships" icon={<Star className="h-4 w-4" />}>Memberships</NavItem>
             <NavItem to="/admin/chats" icon={<MessageSquare className="h-4 w-4" />}>Chatbot</NavItem>
             <NavItem to="/admin/tickets" icon={<TicketIcon className="h-4 w-4" />}>Tickets</NavItem>
           </nav>
@@ -141,55 +162,3 @@ function MobileNav({ to, icon, children }: { to: string; icon: React.ReactNode; 
   );
 }
 
-function SignInGate() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (err) setError(err.message);
-    // on success onAuthStateChange fires and re-renders the admin layout automatically
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
-        <Logo />
-        <h1 className="mt-6 font-display text-xl font-bold">Admin sign in</h1>
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <input
-            type="email" required placeholder="Email" value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
-          />
-          <input
-            type="password" required placeholder="Password" value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
-          />
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <button
-            type="submit" disabled={busy}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
-          >
-            {busy ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function CenterMessage({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
-      <div className="rounded-2xl border border-border bg-surface p-8 text-center">{children}</div>
-    </div>
-  );
-}
