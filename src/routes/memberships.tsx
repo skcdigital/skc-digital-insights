@@ -448,20 +448,17 @@ function MembershipCheckoutModal({
   );
 }
 
-const TICK = <Check className="mx-auto h-4 w-4 text-primary" />;
-const DASH = <span className="text-muted-foreground">—</span>;
-
-function renderCell(v: React.ReactNode | boolean | string) {
-  if (v === true) return TICK;
-  if (v === false) return DASH;
+function renderCell(v: boolean | string) {
+  if (v === true) return <Check className="mx-auto h-4 w-4 text-primary" />;
+  if (v === false) return <span className="text-muted-foreground">—</span>;
   return <span className="text-xs">{v}</span>;
 }
 
 const COMPARISON_ROWS: Array<{
   feature: string;
-  starter: React.ReactNode | boolean | string;
-  growth: React.ReactNode | boolean | string;
-  scale: React.ReactNode | boolean | string;
+  starter: boolean | string;
+  growth: boolean | string;
+  scale: boolean | string;
 }> = [
   { feature: "Website pages",        starter: "Up to 5",    growth: "Up to 10",  scale: "Unlimited" },
   { feature: "SEO setup",            starter: true,         growth: true,        scale: true },
