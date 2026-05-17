@@ -82,13 +82,13 @@ type Plan = {
 type CheckoutProduct = { id: string; title: string; price_zar: number } | null;
 type CheckoutPlan = { id: string; slug: string; name: string; price: number; billing: "monthly" | "annual" } | null;
 
-const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  pdf_guide:     { label: "PDF Guide",    icon: <FileText className="h-3.5 w-3.5" />, color: "text-sky-400 bg-sky-500/10 border-sky-500/30" },
-  course:        { label: "Course",       icon: <BookOpen className="h-3.5 w-3.5" />, color: "text-violet-400 bg-violet-500/10 border-violet-500/30" },
-  software_tool: { label: "Tool",         icon: <Wrench className="h-3.5 w-3.5" />,   color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
-  done_for_you:  { label: "Done-For-You", icon: <Package className="h-3.5 w-3.5" />,  color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
-  newsletter:    { label: "Newsletter",   icon: <Mail className="h-3.5 w-3.5" />,     color: "text-pink-400 bg-pink-500/10 border-pink-500/30" },
-  other:         { label: "Digital",      icon: <Sparkles className="h-3.5 w-3.5" />, color: "text-muted-foreground bg-surface border-border" },
+const TYPE_META: Record<string, { label: string; icon: () => React.ReactNode; color: string }> = {
+  pdf_guide:     { label: "PDF Guide",    icon: () => <FileText className="h-3.5 w-3.5" />, color: "text-sky-400 bg-sky-500/10 border-sky-500/30" },
+  course:        { label: "Course",       icon: () => <BookOpen className="h-3.5 w-3.5" />, color: "text-violet-400 bg-violet-500/10 border-violet-500/30" },
+  software_tool: { label: "Tool",         icon: () => <Wrench className="h-3.5 w-3.5" />,   color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" },
+  done_for_you:  { label: "Done-For-You", icon: () => <Package className="h-3.5 w-3.5" />,  color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
+  newsletter:    { label: "Newsletter",   icon: () => <Mail className="h-3.5 w-3.5" />,     color: "text-pink-400 bg-pink-500/10 border-pink-500/30" },
+   other:         { label: "Digital",      icon: () => <Sparkles className="h-3.5 w-3.5" />, color: "text-muted-foreground bg-surface border-border" },
 };
 
 const FILTER_TABS = [
@@ -100,10 +100,10 @@ const FILTER_TABS = [
   { key: "plans",        label: "Plans" },
 ];
 
-const PLAN_ICONS: Record<string, React.ReactNode> = {
-  starter: <Zap className="h-5 w-5" />,
-  growth:  <TrendingUp className="h-5 w-5" />,
-  scale:   <Rocket className="h-5 w-5" />,
+const PLAN_ICONS: Record<string, () => React.ReactNode> = {
+  starter: () => <Zap className="h-5 w-5" />,
+  growth:  () => <TrendingUp className="h-5 w-5" />,
+  scale:   () => <Rocket className="h-5 w-5" />,
 };
 
 export default function ShopPage() {
@@ -331,7 +331,7 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
   const meta = TYPE_META[product.type] ?? TYPE_META.other;
   return (
     <div className="group flex flex-col rounded-2xl border border-border bg-surface/30 overflow-hidden transition-all hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5">
-      {/* Cover — clicking the image navigates to the detail page */}
+      {/* Cover — clicking navigates to the detail page */}
       <Link to="/product/$slug" params={{ slug: product.slug }} className="block">
         <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/8 to-transparent">
           {product.cover_url ? (
@@ -342,11 +342,11 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
             />
           ) : (
             <div className="flex flex-col items-center gap-2 text-primary/25">
-              <div className="scale-[2.5]">{meta.icon}</div>
+              <div className="scale-[2.5]">{meta.icon()}</div>
             </div>
           )}
           <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider backdrop-blur ${meta.color}`}>
-            {meta.icon} {meta.label}
+            {meta.icon()} {meta.label}
           </span>
           {product.is_free && (
             <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white">
@@ -431,7 +431,7 @@ function PlanCard({
           plan.is_popular ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
         }`}
       >
-        {PLAN_ICONS[plan.slug] ?? <Repeat className="h-5 w-5" />}
+        {(PLAN_ICONS[plan.slug] ?? (() => <Repeat className="h-5 w-5" />))()}
       </div>
 
       <h3 className="mt-4 font-display text-xl font-bold">{plan.name}</h3>
