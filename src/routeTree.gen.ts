@@ -26,6 +26,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalServiceAgreementRouteImport } from './routes/legal.service-agreement'
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
@@ -37,6 +38,7 @@ import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
 import { Route as ApiQuoteRouteImport } from './routes/api/quote'
 import { Route as ApiBlogPdfRouteImport } from './routes/api/blog-pdf'
+import { Route as ApiAuditBookingRouteImport } from './routes/api/audit-booking'
 import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
@@ -143,6 +145,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalTermsRoute = LegalTermsRouteImport.update({
   id: '/legal/terms',
   path: '/legal/terms',
@@ -196,6 +203,11 @@ const ApiQuoteRoute = ApiQuoteRouteImport.update({
 const ApiBlogPdfRoute = ApiBlogPdfRouteImport.update({
   id: '/api/blog-pdf',
   path: '/api/blog-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuditBookingRoute = ApiAuditBookingRouteImport.update({
+  id: '/api/audit-booking',
+  path: '/api/audit-booking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTicketsRoute = AdminTicketsRouteImport.update({
@@ -323,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
+  '/api/audit-booking': typeof ApiAuditBookingRoute
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
@@ -334,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -371,6 +385,7 @@ export interface FileRoutesByTo {
   '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
+  '/api/audit-booking': typeof ApiAuditBookingRoute
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
@@ -382,6 +397,7 @@ export interface FileRoutesByTo {
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -422,6 +438,7 @@ export interface FileRoutesById {
   '/admin/products': typeof AdminProductsRoute
   '/admin/quotes': typeof AdminQuotesRouteWithChildren
   '/admin/tickets': typeof AdminTicketsRouteWithChildren
+  '/api/audit-booking': typeof ApiAuditBookingRoute
   '/api/blog-pdf': typeof ApiBlogPdfRoute
   '/api/quote': typeof ApiQuoteRoute
   '/api/send-doc': typeof ApiSendDocRoute
@@ -433,6 +450,7 @@ export interface FileRoutesById {
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
+  '/product/$slug': typeof ProductSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -474,6 +492,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
+    | '/api/audit-booking'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
@@ -485,6 +504,7 @@ export interface FileRouteTypes {
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
+    | '/product/$slug'
     | '/admin/'
     | '/blog/'
     | '/admin/credit-notes/$id'
@@ -522,6 +542,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
+    | '/api/audit-booking'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
@@ -533,6 +554,7 @@ export interface FileRouteTypes {
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
+    | '/product/$slug'
     | '/admin'
     | '/blog'
     | '/admin/credit-notes/$id'
@@ -572,6 +594,7 @@ export interface FileRouteTypes {
     | '/admin/products'
     | '/admin/quotes'
     | '/admin/tickets'
+    | '/api/audit-booking'
     | '/api/blog-pdf'
     | '/api/quote'
     | '/api/send-doc'
@@ -583,6 +606,7 @@ export interface FileRouteTypes {
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
+    | '/product/$slug'
     | '/admin/'
     | '/blog/'
     | '/admin/credit-notes/$id'
@@ -615,6 +639,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ProductsRoute: typeof ProductsRoute
   ServicesRoute: typeof ServicesRoute
+  ApiAuditBookingRoute: typeof ApiAuditBookingRoute
   ApiBlogPdfRoute: typeof ApiBlogPdfRoute
   ApiQuoteRoute: typeof ApiQuoteRoute
   ApiSendDocRoute: typeof ApiSendDocRoute
@@ -625,6 +650,7 @@ export interface RootRouteChildren {
   LegalRefundRoute: typeof LegalRefundRoute
   LegalServiceAgreementRoute: typeof LegalServiceAgreementRoute
   LegalTermsRoute: typeof LegalTermsRoute
+  ProductSlugRoute: typeof ProductSlugRoute
   ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
@@ -755,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/terms': {
       id: '/legal/terms'
       path: '/legal/terms'
@@ -830,6 +863,13 @@ declare module '@tanstack/react-router' {
       path: '/api/blog-pdf'
       fullPath: '/api/blog-pdf'
       preLoaderRoute: typeof ApiBlogPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/audit-booking': {
+      id: '/api/audit-booking'
+      path: '/api/audit-booking'
+      fullPath: '/api/audit-booking'
+      preLoaderRoute: typeof ApiAuditBookingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/tickets': {
@@ -1088,6 +1128,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ProductsRoute: ProductsRoute,
   ServicesRoute: ServicesRoute,
+  ApiAuditBookingRoute: ApiAuditBookingRoute,
   ApiBlogPdfRoute: ApiBlogPdfRoute,
   ApiQuoteRoute: ApiQuoteRoute,
   ApiSendDocRoute: ApiSendDocRoute,
@@ -1098,6 +1139,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalRefundRoute: LegalRefundRoute,
   LegalServiceAgreementRoute: LegalServiceAgreementRoute,
   LegalTermsRoute: LegalTermsRoute,
+  ProductSlugRoute: ProductSlugRoute,
   ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
