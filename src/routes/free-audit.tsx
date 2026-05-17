@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Zap,
   MessageCircle,
-  Mail,
+  Loader2,
 } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { SITE, waLink } from "@/lib/site";
@@ -99,6 +99,7 @@ function FreeAuditPage() {
                 {[
                   "Honest, jargon-free feedback",
                   "Written action list via WhatsApp",
+                  "Confirmation email with your details",
                   "No sales pressure",
                   "No cost, no strings attached",
                 ].map((t) => (
@@ -145,12 +146,38 @@ function FreeAuditPage() {
 }
 
 function AuditForm() {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [bizType, setBizType] = useState("");
+  const [name, setName]           = useState("");
+  const [email, setEmail]         = useState("");
+  const [phone, setPhone]         = useState("");
+  const [bizType, setBizType]     = useState("");
   const [challenge, setChallenge] = useState("");
-  const [extra, setExtra] = useState("");
-  const [sent, setSent] = useState(false);
+  const [extra, setExtra]         = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
+  const [sent, setSent]           = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/audit-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone, bizType, challenge, extra }),
+      });
+      const data = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError("Network error. Try again or use WhatsApp below.");
+      setLoading(false);
+    }
+  }
 
   function buildWaMessage() {
     return [
@@ -166,40 +193,17 @@ function AuditForm() {
       .join("\n");
   }
 
-  function handleWhatsApp(e: React.FormEvent) {
-    e.preventDefault();
-    const msg = buildWaMessage();
-    // Track in background — don't block WhatsApp from opening
-    fetch("/api/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        source:  "audit",
-        service: challenge || bizType,
-        message: msg,
-        name,
-        phone,
-      }),
-    }).catch(() => {});
-    window.open(waLink(msg), "_blank", "noopener,noreferrer");
-    setSent(true);
-  }
-
-  function handleEmail(e: React.MouseEvent) {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Free audit request — ${name} (${bizType})`);
-    const body = encodeURIComponent(buildWaMessage());
-    window.location.href = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
-    setSent(true);
-  }
-
   if (sent) {
     return (
       <div className="rounded-2xl border border-primary/40 bg-surface/40 p-8 text-center">
         <CheckCircle2 className="mx-auto h-10 w-10 text-primary" />
-        <h3 className="mt-4 font-display text-xl font-bold">We&apos;ve got your request!</h3>
+        <h3 className="mt-4 font-display text-xl font-bold">Booking confirmed!</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          We&apos;ll review your details and come back with your audit on WhatsApp — usually within 4 hours.
+          We&apos;ve saved your request and sent a confirmation to{" "}
+          <span className="font-medium text-foreground">{email}</span>.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          We&apos;ll reach out on WhatsApp (<span className="font-medium text-foreground">{phone}</span>) within 4 hours with your personalised action list.
         </p>
         <Link
           to="/"
@@ -213,14 +217,14 @@ function AuditForm() {
 
   return (
     <form
-      onSubmit={handleWhatsApp}
+      onSubmit={handleSubmit}
       className="rounded-2xl border border-border bg-surface/40 p-6 sm:p-8"
     >
       <p className="font-mono text-xs uppercase tracking-wider text-primary">
         Request your free audit
       </p>
       <p className="mt-1 text-sm text-muted-foreground">
-        Takes 60 seconds — we&apos;ll reach out on WhatsApp.
+        Takes 60 seconds — we&apos;ll reach out on WhatsApp and email you a confirmation.
       </p>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -237,7 +241,20 @@ function AuditForm() {
           />
         </Field>
 
-        <Field label="WhatsApp number">
+        <Field label="Email address">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            maxLength={255}
+            autoComplete="email"
+            placeholder="thandi@example.com"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:border-primary focus:outline-none"
+          />
+        </Field>
+
+        <Field label="WhatsApp number" className="sm:col-span-2">
           <input
             type="tel"
             required
@@ -290,20 +307,36 @@ function AuditForm() {
         </Field>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      {error && (
+        <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-6 space-y-3">
         <button
           type="submit"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          <MessageCircle className="h-4 w-4" /> Send on WhatsApp
+          {loading ? (
+            <><Loader2 className="h-4 w-4 animate-spin" /> Booking your audit…</>
+          ) : (
+            <><CheckCircle2 className="h-4 w-4" /> Book Free Audit</>
+          )}
         </button>
-        <button
-          type="button"
-          onClick={handleEmail}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:border-primary/40 hover:text-primary"
-        >
-          <Mail className="h-4 w-4" /> Email instead
-        </button>
+
+        {/* WhatsApp fallback — always available */}
+        {(name && phone && bizType && challenge) && (
+          <a
+            href={waLink(buildWaMessage())}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold transition-colors hover:border-primary/40 hover:text-primary"
+          >
+            <MessageCircle className="h-4 w-4" /> Send on WhatsApp instead
+          </a>
+        )}
       </div>
 
       <p className="mt-3 text-center font-mono text-[11px] text-muted-foreground">

@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   FileText, BookOpen, Wrench, Package, Mail, Sparkles,
   ShoppingCart, Download, ArrowRight, X, Loader2,
-  Check, Zap, TrendingUp, Rocket, CreditCard, ShieldCheck, Clock, Repeat,
+  Check, Zap, TrendingUp, Rocket, CreditCard, ShieldCheck, Clock, Repeat, Eye,
 } from "lucide-react";
 import { submitPayFastForm } from "@/lib/payfast";
 import { SITE } from "@/lib/site";
@@ -110,8 +110,8 @@ export default function ShopPage() {
   // Products and plans come from the server-side loader — already in the HTML.
   const { products, plans } = Route.useLoaderData();
 
-  const [filter, setFilter]             = useState("all");
-  const [billing, setBilling]           = useState<"monthly" | "annual">("monthly");
+  const [filter, setFilter]       = useState("all");
+  const [billing, setBilling]     = useState<"monthly" | "annual">("monthly");
   const [checkoutProduct, setCheckoutProduct] = useState<CheckoutProduct>(null);
   const [checkoutPlan, setCheckoutPlan]       = useState<CheckoutPlan>(null);
 
@@ -331,32 +331,36 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
   const meta = TYPE_META[product.type] ?? TYPE_META.other;
   return (
     <div className="group flex flex-col rounded-2xl border border-border bg-surface/30 overflow-hidden transition-all hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5">
-      {/* Cover */}
-      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/8 to-transparent">
-        {product.cover_url ? (
-          <img
-            src={product.cover_url}
-            alt={product.title}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex flex-col items-center gap-2 text-primary/25">
-            <div className="scale-[2.5]">{meta.icon()}</div>
-          </div>
-        )}
-        <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider backdrop-blur ${meta.color}`}>
-          {meta.icon()} {meta.label}
-        </span>
-        {product.is_free && (
-          <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white">
-            Free
+      {/* Cover — clicking navigates to the detail page */}
+      <Link to="/product/$slug" params={{ slug: product.slug }} className="block">
+        <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/8 to-transparent">
+          {product.cover_url ? (
+            <img
+              src={product.cover_url}
+              alt={product.title}
+              className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-primary/25">
+              <div className="scale-[2.5]">{meta.icon()}</div>
+            </div>
+          )}
+          <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider backdrop-blur ${meta.color}`}>
+            {meta.icon()} {meta.label}
           </span>
-        )}
-      </div>
+          {product.is_free && (
+            <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white">
+              Free
+            </span>
+          )}
+        </div>
+      </Link>
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="text-sm font-bold leading-snug">{product.title}</h3>
+        <Link to="/product/$slug" params={{ slug: product.slug }}>
+          <h3 className="text-sm font-bold leading-snug group-hover:text-primary transition-colors">{product.title}</h3>
+        </Link>
         <p className="flex-1 text-xs leading-relaxed text-muted-foreground line-clamp-3">
           {product.description}
         </p>
@@ -368,21 +372,31 @@ function ProductCard({ product, onBuy }: { product: Product; onBuy: () => void }
               `R${product.price_zar.toLocaleString("en-ZA")}`
             )}
           </span>
-          {product.is_free ? (
-            <a
-              href={`/contact?product=${encodeURIComponent(product.slug)}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+          <div className="flex items-center gap-2">
+            <Link
+              to="/product/$slug"
+              params={{ slug: product.slug }}
+              className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold transition-colors hover:border-primary/40 hover:text-primary"
             >
-              <Download className="h-3.5 w-3.5" /> Get free
-            </a>
-          ) : (
-            <button
-              onClick={onBuy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-95"
-            >
-              <ShoppingCart className="h-3.5 w-3.5" /> Buy now
-            </button>
-          )}
+              <Eye className="h-3 w-3" /> View
+            </Link>
+            {product.is_free ? (
+              <Link
+                to="/product/$slug"
+                params={{ slug: product.slug }}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+              >
+                <Download className="h-3.5 w-3.5" /> Get free
+              </Link>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); onBuy(); }}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:opacity-90 active:scale-95"
+              >
+                <ShoppingCart className="h-3.5 w-3.5" /> Buy
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
