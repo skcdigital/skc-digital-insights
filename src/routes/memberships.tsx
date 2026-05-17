@@ -40,7 +40,7 @@ const PLANS = [
     slug: "starter",
     name: "Starter",
     tagline: "For small businesses just getting online",
-    icon: <Zap className="h-5 w-5" />,
+    icon: () => <Zap className="h-5 w-5" />,
     price_monthly: 499,
     price_annual: 4490,
     highlight: false,
@@ -58,7 +58,7 @@ const PLANS = [
     slug: "growth",
     name: "Growth",
     tagline: "For businesses ready to scale digitally",
-    icon: <TrendingUp className="h-5 w-5" />,
+    icon: () => <TrendingUp className="h-5 w-5" />,
     price_monthly: 999,
     price_annual: 8990,
     highlight: true,
@@ -77,7 +77,7 @@ const PLANS = [
     slug: "scale",
     name: "Scale",
     tagline: "Full-service digital partner for ambitious brands",
-    icon: <Rocket className="h-5 w-5" />,
+    icon: () => <Rocket className="h-5 w-5" />,
     price_monthly: 1999,
     price_annual: 17990,
     highlight: false,
@@ -178,7 +178,7 @@ function MembershipsPage() {
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
                   plan.highlight ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
                 }`}>
-                  {plan.icon}
+                  {plan.icon()}
                 </div>
 
                 <h2 className="mt-4 font-display text-2xl font-bold">{plan.name}</h2>
