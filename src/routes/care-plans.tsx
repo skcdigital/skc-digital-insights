@@ -64,10 +64,10 @@ const PLANS = [
   },
 ];
 
-const PERKS = [
-  { icon: <Shield className="h-5 w-5" />, title: "Secure", body: "Patches, backups and monitoring on autopilot." },
-  { icon: <RefreshCw className="h-5 w-5" />, title: "Always fresh", body: "Hours, prices, photos — kept current monthly." },
-  { icon: <FileEdit className="h-5 w-5" />, title: "No technical work for you", body: "WhatsApp the change, we handle it." },
+const PERKS: Array<{ icon: () => React.ReactNode; title: string; body: string }> = [
+  { icon: () => <Shield className="h-5 w-5" />, title: "Secure", body: "Patches, backups and monitoring on autopilot." },
+  { icon: () => <RefreshCw className="h-5 w-5" />, title: "Always fresh", body: "Hours, prices, photos — kept current monthly." },
+  { icon: () => <FileEdit className="h-5 w-5" />, title: "No technical work for you", body: "WhatsApp the change, we handle it." },
 ];
 
 function CarePlansPage() {
@@ -88,7 +88,7 @@ function CarePlansPage() {
         <div className="grid gap-5 md:grid-cols-3">
           {PERKS.map((p) => (
             <div key={p.title} className="rounded-xl border border-border bg-surface/40 p-6">
-              <div className="text-primary">{p.icon}</div>
+              <div className="text-primary">{p.icon()}</div>
               <h3 className="mt-4 font-display text-lg font-semibold">{p.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{p.body}</p>
             </div>
