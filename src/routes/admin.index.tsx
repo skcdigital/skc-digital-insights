@@ -37,12 +37,12 @@ const ZAR = (n: number) =>
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-const CHANNEL_ICON: Record<string, React.ReactNode> = {
-  whatsapp: <MessageSquare className="h-3 w-3" />,
-  email:    <Mail className="h-3 w-3" />,
-  phone:    <PhoneCall className="h-3 w-3" />,
-  form:     <Globe className="h-3 w-3" />,
-  referral: <Share2 className="h-3 w-3" />,
+const CHANNEL_ICON: Record<string, () => React.ReactNode> = {
+  whatsapp: () => <MessageSquare className="h-3 w-3" />,
+  email:    () => <Mail className="h-3 w-3" />,
+  phone:    () => <PhoneCall className="h-3 w-3" />,
+  form:     () => <Globe className="h-3 w-3" />,
+  referral: () => <Share2 className="h-3 w-3" />,
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -312,7 +312,7 @@ function AdminHome() {
                   className="flex items-center justify-between gap-3 py-2.5 hover:opacity-80 transition-opacity">
                   <div className="flex min-w-0 items-center gap-2.5">
                     <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-zinc-800 text-muted-foreground">
-                      {CHANNEL_ICON[l.channel] ?? <Globe className="h-3 w-3" />}
+                      {(CHANNEL_ICON[l.channel] ?? (() => <Globe className="h-3 w-3" />))()}
                     </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold">{l.name}</p>
