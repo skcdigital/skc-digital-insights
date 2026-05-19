@@ -31,6 +31,11 @@ jobs:
           RESEND_API_KEY: "re_G2fzGzrg_KHvWGqWFhAtmRKWawhujrdh6"
           SUPABASE_URL: "https://abucbojsosfxdaufdapw.supabase.co"
           SUPABASE_SERVICE_ROLE_KEY: "sb_secret_urfmnu1WLcDFIszum0z1ag_itAwuxM_"
+          PAYFAST_MERCHANT_ID: "34991025"
+          PAYFAST_MERCHANT_KEY: "sfu7q6oaqtpvu"
+          PAYFAST_PASSPHRASE: "SKc0402231235084"
+          PAYFAST_SANDBOX: "false"
+          SITE_URL: "https://www.skcdigital.co.za"
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy --config dist/server/wrangler.json
