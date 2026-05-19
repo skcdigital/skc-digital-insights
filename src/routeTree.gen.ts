@@ -10,29 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
-import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
-import { Route as MembershipsRouteImport } from './routes/memberships'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FreeAuditRouteImport } from './routes/free-audit'
-import { Route as DemosRouteImport } from './routes/demos'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
-import { Route as CarePlansRouteImport } from './routes/care-plans'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as PaySuccessRouteImport } from './routes/pay.success'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalServiceAgreementRouteImport } from './routes/legal.service-agreement'
 import { Route as LegalRefundRouteImport } from './routes/legal.refund'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
-import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
-import { Route as CheckoutFailedRouteImport } from './routes/checkout.failed'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as ApiSendDocRouteImport } from './routes/api/send-doc'
@@ -47,10 +41,7 @@ import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as AdminInvoicesRouteImport } from './routes/admin.invoices'
 import { Route as AdminCreditNotesRouteImport } from './routes/admin.credit-notes'
 import { Route as AdminChatsRouteImport } from './routes/admin.chats'
-import { Route as ApiYocoWebhookRouteImport } from './routes/api/yoco/webhook'
-import { Route as ApiYocoCheckoutRouteImport } from './routes/api/yoco/checkout'
-import { Route as ApiPayfastNotifyRouteImport } from './routes/api/payfast/notify'
-import { Route as ApiPayfastCheckoutRouteImport } from './routes/api/payfast/checkout'
+import { Route as PayTypeNumberRouteImport } from './routes/pay.$type.$number'
 import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
 import { Route as ApiAdminCheckRoleRouteImport } from './routes/api/admin/check-role'
 import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
@@ -65,11 +56,6 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -78,11 +64,6 @@ const PricingRoute = PricingRouteImport.update({
 const PortfolioRoute = PortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MembershipsRoute = MembershipsRouteImport.update({
-  id: '/memberships',
-  path: '/memberships',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -95,11 +76,6 @@ const FreeAuditRoute = FreeAuditRouteImport.update({
   path: '/free-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemosRoute = DemosRouteImport.update({
-  id: '/demos',
-  path: '/demos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -108,11 +84,6 @@ const ContactRoute = ContactRouteImport.update({
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CarePlansRoute = CarePlansRouteImport.update({
-  id: '/care-plans',
-  path: '/care-plans',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogRoute = BlogRouteImport.update({
@@ -145,9 +116,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const ProductSlugRoute = ProductSlugRouteImport.update({
-  id: '/product/$slug',
-  path: '/product/$slug',
+const PaySuccessRoute = PaySuccessRouteImport.update({
+  id: '/pay/success',
+  path: '/pay/success',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalTermsRoute = LegalTermsRouteImport.update({
@@ -168,16 +139,6 @@ const LegalRefundRoute = LegalRefundRouteImport.update({
 const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   id: '/legal/privacy',
   path: '/legal/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
-  id: '/checkout/success',
-  path: '/checkout/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutFailedRoute = CheckoutFailedRouteImport.update({
-  id: '/checkout/failed',
-  path: '/checkout/failed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -250,24 +211,9 @@ const AdminChatsRoute = AdminChatsRouteImport.update({
   path: '/chats',
   getParentRoute: () => AdminRoute,
 } as any)
-const ApiYocoWebhookRoute = ApiYocoWebhookRouteImport.update({
-  id: '/api/yoco/webhook',
-  path: '/api/yoco/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiYocoCheckoutRoute = ApiYocoCheckoutRouteImport.update({
-  id: '/api/yoco/checkout',
-  path: '/api/yoco/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPayfastNotifyRoute = ApiPayfastNotifyRouteImport.update({
-  id: '/api/payfast/notify',
-  path: '/api/payfast/notify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPayfastCheckoutRoute = ApiPayfastCheckoutRouteImport.update({
-  id: '/api/payfast/checkout',
-  path: '/api/payfast/checkout',
+const PayTypeNumberRoute = PayTypeNumberRouteImport.update({
+  id: '/pay/$type/$number',
+  path: '/pay/$type/$number',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
@@ -316,16 +262,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
-  '/care-plans': typeof CarePlansRoute
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
-  '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
-  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
-  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
@@ -341,13 +283,11 @@ export interface FileRoutesByFullPath {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/checkout/failed': typeof CheckoutFailedRoute
-  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/pay/success': typeof PaySuccessRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -358,24 +298,17 @@ export interface FileRoutesByFullPath {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
-  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
-  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
-  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
+  '/pay/$type/$number': typeof PayTypeNumberRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/care-plans': typeof CarePlansRoute
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
-  '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
-  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
-  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
@@ -391,13 +324,11 @@ export interface FileRoutesByTo {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/checkout/failed': typeof CheckoutFailedRoute
-  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/pay/success': typeof PaySuccessRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -408,10 +339,7 @@ export interface FileRoutesByTo {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
-  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
-  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
-  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
+  '/pay/$type/$number': typeof PayTypeNumberRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -419,16 +347,12 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
-  '/care-plans': typeof CarePlansRoute
   '/chat': typeof ChatRoute
   '/contact': typeof ContactRoute
-  '/demos': typeof DemosRoute
   '/free-audit': typeof FreeAuditRoute
   '/login': typeof LoginRoute
-  '/memberships': typeof MembershipsRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
-  '/products': typeof ProductsRoute
   '/services': typeof ServicesRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/credit-notes': typeof AdminCreditNotesRouteWithChildren
@@ -444,13 +368,11 @@ export interface FileRoutesById {
   '/api/send-doc': typeof ApiSendDocRoute
   '/api/track': typeof ApiTrackRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/checkout/failed': typeof CheckoutFailedRoute
-  '/checkout/success': typeof CheckoutSuccessRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/refund': typeof LegalRefundRoute
   '/legal/service-agreement': typeof LegalServiceAgreementRoute
   '/legal/terms': typeof LegalTermsRoute
-  '/product/$slug': typeof ProductSlugRoute
+  '/pay/success': typeof PaySuccessRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/credit-notes/$id': typeof AdminCreditNotesIdRoute
@@ -461,10 +383,7 @@ export interface FileRoutesById {
   '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/admin/check-role': typeof ApiAdminCheckRoleRoute
   '/api/auth/signup': typeof ApiAuthSignupRoute
-  '/api/payfast/checkout': typeof ApiPayfastCheckoutRoute
-  '/api/payfast/notify': typeof ApiPayfastNotifyRoute
-  '/api/yoco/checkout': typeof ApiYocoCheckoutRoute
-  '/api/yoco/webhook': typeof ApiYocoWebhookRoute
+  '/pay/$type/$number': typeof PayTypeNumberRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -473,16 +392,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/blog'
-    | '/care-plans'
     | '/chat'
     | '/contact'
-    | '/demos'
     | '/free-audit'
     | '/login'
-    | '/memberships'
     | '/portfolio'
     | '/pricing'
-    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
@@ -498,13 +413,11 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
-    | '/checkout/failed'
-    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
-    | '/product/$slug'
+    | '/pay/success'
     | '/admin/'
     | '/blog/'
     | '/admin/credit-notes/$id'
@@ -515,24 +428,17 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/payfast/checkout'
-    | '/api/payfast/notify'
-    | '/api/yoco/checkout'
-    | '/api/yoco/webhook'
+    | '/pay/$type/$number'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/care-plans'
     | '/chat'
     | '/contact'
-    | '/demos'
     | '/free-audit'
     | '/login'
-    | '/memberships'
     | '/portfolio'
     | '/pricing'
-    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
@@ -548,13 +454,11 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
-    | '/checkout/failed'
-    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
-    | '/product/$slug'
+    | '/pay/success'
     | '/admin'
     | '/blog'
     | '/admin/credit-notes/$id'
@@ -565,26 +469,19 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/payfast/checkout'
-    | '/api/payfast/notify'
-    | '/api/yoco/checkout'
-    | '/api/yoco/webhook'
+    | '/pay/$type/$number'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
     | '/blog'
-    | '/care-plans'
     | '/chat'
     | '/contact'
-    | '/demos'
     | '/free-audit'
     | '/login'
-    | '/memberships'
     | '/portfolio'
     | '/pricing'
-    | '/products'
     | '/services'
     | '/admin/chats'
     | '/admin/credit-notes'
@@ -600,13 +497,11 @@ export interface FileRouteTypes {
     | '/api/send-doc'
     | '/api/track'
     | '/blog/$slug'
-    | '/checkout/failed'
-    | '/checkout/success'
     | '/legal/privacy'
     | '/legal/refund'
     | '/legal/service-agreement'
     | '/legal/terms'
-    | '/product/$slug'
+    | '/pay/success'
     | '/admin/'
     | '/blog/'
     | '/admin/credit-notes/$id'
@@ -617,10 +512,7 @@ export interface FileRouteTypes {
     | '/api/admin/bootstrap'
     | '/api/admin/check-role'
     | '/api/auth/signup'
-    | '/api/payfast/checkout'
-    | '/api/payfast/notify'
-    | '/api/yoco/checkout'
-    | '/api/yoco/webhook'
+    | '/pay/$type/$number'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -628,36 +520,27 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
-  CarePlansRoute: typeof CarePlansRoute
   ChatRoute: typeof ChatRoute
   ContactRoute: typeof ContactRoute
-  DemosRoute: typeof DemosRoute
   FreeAuditRoute: typeof FreeAuditRoute
   LoginRoute: typeof LoginRoute
-  MembershipsRoute: typeof MembershipsRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
-  ProductsRoute: typeof ProductsRoute
   ServicesRoute: typeof ServicesRoute
   ApiAuditBookingRoute: typeof ApiAuditBookingRoute
   ApiBlogPdfRoute: typeof ApiBlogPdfRoute
   ApiQuoteRoute: typeof ApiQuoteRoute
   ApiSendDocRoute: typeof ApiSendDocRoute
   ApiTrackRoute: typeof ApiTrackRoute
-  CheckoutFailedRoute: typeof CheckoutFailedRoute
-  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalRefundRoute: typeof LegalRefundRoute
   LegalServiceAgreementRoute: typeof LegalServiceAgreementRoute
   LegalTermsRoute: typeof LegalTermsRoute
-  ProductSlugRoute: typeof ProductSlugRoute
+  PaySuccessRoute: typeof PaySuccessRoute
   ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiAdminCheckRoleRoute: typeof ApiAdminCheckRoleRoute
   ApiAuthSignupRoute: typeof ApiAuthSignupRoute
-  ApiPayfastCheckoutRoute: typeof ApiPayfastCheckoutRoute
-  ApiPayfastNotifyRoute: typeof ApiPayfastNotifyRoute
-  ApiYocoCheckoutRoute: typeof ApiYocoCheckoutRoute
-  ApiYocoWebhookRoute: typeof ApiYocoWebhookRoute
+  PayTypeNumberRoute: typeof PayTypeNumberRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -667,13 +550,6 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -690,13 +566,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/memberships': {
-      id: '/memberships'
-      path: '/memberships'
-      fullPath: '/memberships'
-      preLoaderRoute: typeof MembershipsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -711,13 +580,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FreeAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demos': {
-      id: '/demos'
-      path: '/demos'
-      fullPath: '/demos'
-      preLoaderRoute: typeof DemosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -730,13 +592,6 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/care-plans': {
-      id: '/care-plans'
-      path: '/care-plans'
-      fullPath: '/care-plans'
-      preLoaderRoute: typeof CarePlansRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog': {
@@ -781,11 +636,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/product/$slug': {
-      id: '/product/$slug'
-      path: '/product/$slug'
-      fullPath: '/product/$slug'
-      preLoaderRoute: typeof ProductSlugRouteImport
+    '/pay/success': {
+      id: '/pay/success'
+      path: '/pay/success'
+      fullPath: '/pay/success'
+      preLoaderRoute: typeof PaySuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/terms': {
@@ -814,20 +669,6 @@ declare module '@tanstack/react-router' {
       path: '/legal/privacy'
       fullPath: '/legal/privacy'
       preLoaderRoute: typeof LegalPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout/success': {
-      id: '/checkout/success'
-      path: '/checkout/success'
-      fullPath: '/checkout/success'
-      preLoaderRoute: typeof CheckoutSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout/failed': {
-      id: '/checkout/failed'
-      path: '/checkout/failed'
-      fullPath: '/checkout/failed'
-      preLoaderRoute: typeof CheckoutFailedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -928,32 +769,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChatsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/api/yoco/webhook': {
-      id: '/api/yoco/webhook'
-      path: '/api/yoco/webhook'
-      fullPath: '/api/yoco/webhook'
-      preLoaderRoute: typeof ApiYocoWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/yoco/checkout': {
-      id: '/api/yoco/checkout'
-      path: '/api/yoco/checkout'
-      fullPath: '/api/yoco/checkout'
-      preLoaderRoute: typeof ApiYocoCheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payfast/notify': {
-      id: '/api/payfast/notify'
-      path: '/api/payfast/notify'
-      fullPath: '/api/payfast/notify'
-      preLoaderRoute: typeof ApiPayfastNotifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/payfast/checkout': {
-      id: '/api/payfast/checkout'
-      path: '/api/payfast/checkout'
-      fullPath: '/api/payfast/checkout'
-      preLoaderRoute: typeof ApiPayfastCheckoutRouteImport
+    '/pay/$type/$number': {
+      id: '/pay/$type/$number'
+      path: '/pay/$type/$number'
+      fullPath: '/pay/$type/$number'
+      preLoaderRoute: typeof PayTypeNumberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/signup': {
@@ -1117,36 +937,27 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
-  CarePlansRoute: CarePlansRoute,
   ChatRoute: ChatRoute,
   ContactRoute: ContactRoute,
-  DemosRoute: DemosRoute,
   FreeAuditRoute: FreeAuditRoute,
   LoginRoute: LoginRoute,
-  MembershipsRoute: MembershipsRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
-  ProductsRoute: ProductsRoute,
   ServicesRoute: ServicesRoute,
   ApiAuditBookingRoute: ApiAuditBookingRoute,
   ApiBlogPdfRoute: ApiBlogPdfRoute,
   ApiQuoteRoute: ApiQuoteRoute,
   ApiSendDocRoute: ApiSendDocRoute,
   ApiTrackRoute: ApiTrackRoute,
-  CheckoutFailedRoute: CheckoutFailedRoute,
-  CheckoutSuccessRoute: CheckoutSuccessRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalRefundRoute: LegalRefundRoute,
   LegalServiceAgreementRoute: LegalServiceAgreementRoute,
   LegalTermsRoute: LegalTermsRoute,
-  ProductSlugRoute: ProductSlugRoute,
+  PaySuccessRoute: PaySuccessRoute,
   ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiAdminCheckRoleRoute: ApiAdminCheckRoleRoute,
   ApiAuthSignupRoute: ApiAuthSignupRoute,
-  ApiPayfastCheckoutRoute: ApiPayfastCheckoutRoute,
-  ApiPayfastNotifyRoute: ApiPayfastNotifyRoute,
-  ApiYocoCheckoutRoute: ApiYocoCheckoutRoute,
-  ApiYocoWebhookRoute: ApiYocoWebhookRoute,
+  PayTypeNumberRoute: PayTypeNumberRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

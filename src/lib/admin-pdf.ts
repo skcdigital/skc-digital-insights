@@ -290,6 +290,40 @@ function buildBankingDetails(
   return y;
 }
 
+function buildPayLink(
+  doc: jsPDF,
+  pageW: number,
+  margin: number,
+  yStart: number,
+  docNumber: string,
+  docType: "invoice" | "quote",
+): number {
+  const y = yStart + 16;
+  const boxH = 54;
+  const url = `https://skcdigital.co.za/pay/${docType}/${docNumber}`;
+
+  doc.setFillColor(239, 246, 255);
+  doc.setDrawColor(...accent);
+  doc.roundedRect(margin, y - 10, pageW - margin * 2, boxH, 4, 4, "FD");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(...accent);
+  doc.text("PAY ONLINE", margin + 10, y + 4);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...muted);
+  doc.text("Click the link below to pay securely by card via PayFast:", margin + 10, y + 18);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(...accent);
+  doc.textWithLink(url, margin + 10, y + 34, { url });
+
+  return y + boxH + 6;
+}
+
 function buildFooter(doc: jsPDF, pageW: number, margin: number) {
   const pageCount = (doc.internal as { getNumberOfPages: () => number }).getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
@@ -345,6 +379,12 @@ export async function generateQuoteDocPdf(quote: QuoteDoc, items: DocItem[]): Pr
     y = buildNotes(doc, pageW, margin, y, quote.notes);
   }
 
+  {
+    const pageH = doc.internal.pageSize.getHeight();
+    if (y + 80 > pageH - 60) { doc.addPage(); y = 40; }
+    buildPayLink(doc, pageW, margin, y, quote.number, "quote");
+  }
+
   buildFooter(doc, pageW, margin);
   return doc.output("blob");
 }
@@ -391,6 +431,12 @@ export async function generateInvoiceDocPdf(invoice: InvoiceDoc, items: DocItem[
       y = 40;
     }
     y = buildBankingDetails(doc, pageW, margin, y, invoice.banking_details);
+  }
+
+  {
+    const pageH = doc.internal.pageSize.getHeight();
+    if (y + 80 > pageH - 60) { doc.addPage(); y = 40; }
+    buildPayLink(doc, pageW, margin, y, invoice.number, "invoice");
   }
 
   buildFooter(doc, pageW, margin);

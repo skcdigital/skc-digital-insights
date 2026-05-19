@@ -97,10 +97,10 @@ function Hero() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/products"
+              to="/services"
               className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Browse the Shop
+              View Services
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link

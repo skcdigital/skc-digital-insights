@@ -54,10 +54,10 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Link
-            to="/products"
+            to="/free-audit"
             className="hidden rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
           >
-            Shop Now
+            Free Audit
           </Link>
           <button
             type="button"

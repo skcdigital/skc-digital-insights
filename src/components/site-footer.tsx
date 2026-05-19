@@ -44,13 +44,10 @@ export function SiteFooter() {
             </h4>
             <ul className="mt-4 space-y-2 text-sm">
               {[
-                { to: "/products", label: "Shop" },
                 { to: "/services", label: "Services" },
                 { to: "/pricing", label: "Pricing" },
-                { to: "/care-plans", label: "Care Plans" },
                 { to: "/portfolio", label: "Portfolio" },
-                { to: "/demos", label: "Demos" },
-                { to: "/memberships", label: "Membership Plans" },
+                { to: "/free-audit", label: "Free Audit" },
               ].map((l) => (
                 <li key={l.to}>
                   <Link
